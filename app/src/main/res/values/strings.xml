@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">My Application</string>
+
+    <!-- Login Activity -->
+    <string name="LoginActivity__title__login">Login</string>
+    <string name="LoginActivity__hint__email">Email</string>
+    <string name="LoginActivity__hint__password">Password</string>
+    <string name="LoginActivity__text__haveAccount">Don\'t have an Account?\nClick to Register</string>
+    <string name="LoginActivity__btnText__LoginBtn">Login</string>
+
+    <string name="LoginActivity__err__emailEmpty">Email is required</string>
+    <string name="LoginActivity__err__passwordEmpty">Password is required</string>
+    <string name="LoginActivity__err__loginingErr"> Logining failed! Password or email is incorrect!</string>
+
+    <!-- Sign up Activity -->
+    <string name="SignUpActivity__title__signup">Sign Up</string>
+    <string name="SignUpActivity__hint__email">Email</string>
+    <string name="SignUpActivity__hint__password">Password</string>
+    <string name="SignUpActivity__hint__login">Login</string>
+    <string name="SignUpActivity__text__haveAccount">Already have an Account?\nClick to Login</string>
+    <string name="SignUpActivity__btnText__signupBtn">Sign Up</string>
+
+    <string name="SignUpActivity__err__emailEmpty">Email is required</string>
+    <string name="SignUpActivity__err__passwordEmpty">Password is required</string>
+    <string name="SignUpActivity__err__loginingErr"> Logining failed! Password or email is incorrect!</string>
+
+
+</resources>
