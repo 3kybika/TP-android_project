@@ -6,6 +6,7 @@ import alex.myapplication.models.IdForm;
 import alex.myapplication.models.LoginForm;
 import alex.myapplication.models.SignUpForm;
 import alex.myapplication.models.UserModel;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -35,7 +36,7 @@ public interface Api {
     );
 
     @GET("me/")
-    Call<UserModel> getUser();
+    Call<ResponseBody> getUser();
 
     @DELETE("deleteuser/")
     Call<DefaultResponse> deleteUser();
