@@ -39,4 +39,6 @@ public interface Api {
     @DELETE("deleteuser/")
     Call<ResponseBody> deleteUser();
 
+    @GET("tasks/")
+    Call<ResponseBody> getTasks();
 }

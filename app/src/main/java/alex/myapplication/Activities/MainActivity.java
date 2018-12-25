@@ -1,25 +1,19 @@
 package alex.myapplication.Activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.net.HttpURLConnection;
-import java.net.NetworkInterface;
-
 import alex.myapplication.R;
-import alex.myapplication.api.RetrofitClient;
-import alex.myapplication.models.IdForm;
 import alex.myapplication.models.SignUpForm;
 import alex.myapplication.models.UserModel;
 import alex.myapplication.services.NetworkService;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -45,6 +39,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
         }
     };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // ToDo: Must it inspect: are already loggined in?
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +99,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         networkService.signup(new SignUpForm(name, email, password) , userListener);
     }
 
+    private static void hideKeyboard(final View input) {
+        final InputMethodManager inputMethodManager = (InputMethodManager) input.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (inputMethodManager != null) {
+            inputMethodManager.hideSoftInputFromWindow(input.getWindowToken(), 0);
+        }
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -108,6 +115,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.textViewLogin:
                 startActivity(new Intent(this, LoginActivity.class));
                 break;
+            default:
+                hideKeyboard(view);
         }
     }
 }

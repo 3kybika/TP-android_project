@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:orientation="vertical"
+    android:layout_margin="5dp"
+    android:background="@color/colorFormBackground"
+    >
+
+        <CheckBox
+            android:id="@+id/task_title"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:textSize="25sp"
+            android:layout_marginStart="5dp"
+            android:text="Task title"
+            android:textColor="@color/mainTextColour"
+            />
+
+        <TextView
+            android:id="@+id/task_description"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:textSize="20sp"
+            android:layout_marginStart="5dp"
+            android:text="Sample description"
+            android:textColor="@color/textLightColour"
+            />
+        <LinearLayout
+            android:id="@+id/authorString"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:background="@color/colorFormBackground"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/taskAuthorTitle"
+                android:layout_width="70dp"
+                android:layout_height="match_parent"
+                android:textSize="15sp"
+                android:layout_marginStart="5dp"
+                android:text="Author:"
+                android:textColor="@color/mainTextColour"
+                />
+            <TextView
+                android:id="@+id/taskAuthor"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:textSize="15sp"
+                android:layout_marginStart="5dp"
+                android:text="Sample Author"
+                android:textColor="@color/textLightColour"
+                />
+        </LinearLayout>
+
+</LinearLayout>

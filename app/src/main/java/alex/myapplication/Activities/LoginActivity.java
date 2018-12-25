@@ -8,12 +8,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.net.HttpURLConnection;
-
 import alex.myapplication.R;
-import alex.myapplication.api.RetrofitClient;
 import alex.myapplication.models.LoginForm;
-import alex.myapplication.models.SignUpForm;
 import alex.myapplication.models.UserModel;
 import alex.myapplication.services.NetworkService;
 

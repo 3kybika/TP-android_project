@@ -8,8 +8,10 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.HttpURLConnection;
@@ -24,6 +26,7 @@ import alex.myapplication.api.Api;
 import alex.myapplication.models.ChangeUserDataForm;
 import alex.myapplication.models.LoginForm;
 import alex.myapplication.models.SignUpForm;
+import alex.myapplication.models.TaskModel;
 import alex.myapplication.models.UserModel;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
@@ -103,6 +106,15 @@ public class NetworkService {
     private UserModel parseUser(final String body) throws IOException {
         try {
             return GSON.fromJson(body, UserModel.class);
+        } catch (JsonSyntaxException e) {
+            throw new IOException(e);
+        }
+    }
+
+    private List<TaskModel> parseTasks(final String body) throws IOException {
+        try {
+            Type listType = new TypeToken<List<TaskModel>>(){}.getType();
+            return (List<TaskModel>) GSON.fromJson(body, listType);
         } catch (JsonSyntaxException e) {
             throw new IOException(e);
         }
@@ -213,8 +225,70 @@ public class NetworkService {
         });
     }
 
+    private void invokeTaskSuccess(final ListenerHandler<OnTaskGetListener> handler, final List<TaskModel> tasks) {
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                OnTaskGetListener listener = handler.getListener();
+                if (listener != null) {
+                    Log.d("API", "listener NOT null");
+                    listener.onTasksSuccess(tasks);
+                } else {
+                    Log.d("API", "listener is null");
+                }
+            }
+        });
+    }
+
+    private void invokeTaskError(final ListenerHandler<OnTaskGetListener> handler, final Exception error) {
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                OnTaskGetListener listener = handler.getListener();
+                if (listener != null) {
+                    Log.d("API", "listener NOT null");
+                    listener.onTasksError(error);
+                } else {
+                    Log.d("API", "listener is null");
+                }
+            }
+        });
+    }
+
     public interface OnUserGetListener {
         void onUserSuccess(final UserModel user);
         void onUserError(final Exception error);
+    }
+
+
+    public ListenerHandler<OnTaskGetListener> getTasks(final OnTaskGetListener listener) {
+        final ListenerHandler<OnTaskGetListener> handler = new ListenerHandler<>(listener);
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final Response<ResponseBody> response = api.getTasks().execute();
+                    try (final ResponseBody responseBody = response.body()) {
+                        if (response.code() != HttpURLConnection.HTTP_OK  ) {
+                            throw new IOException("HTTP code " + response.code());
+                        }
+                        if (responseBody == null) {
+                            throw new IOException("Cannot get body");
+                        }
+                        final String body = responseBody.string();
+                        invokeTaskSuccess(handler, parseTasks(body));
+                    }
+                } catch (IOException e) {
+                    invokeTaskError(handler, e);
+                }
+            }
+        });
+        return handler;
+    }
+
+
+    public interface OnTaskGetListener {
+        void onTasksSuccess(final List<TaskModel> user);
+        void onTasksError(final Exception error);
     }
 }
