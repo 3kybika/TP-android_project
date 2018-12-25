@@ -3,8 +3,8 @@ package alex.myapplication.api;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 
+import okhttp3.JavaNetCookieJar;
 import okhttp3.OkHttpClient;
-import okhttp3.internal.JavaNetCookieJar;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

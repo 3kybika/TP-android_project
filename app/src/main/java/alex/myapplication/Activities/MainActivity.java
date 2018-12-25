@@ -9,12 +9,14 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.net.HttpURLConnection;
+import java.net.NetworkInterface;
 
 import alex.myapplication.R;
 import alex.myapplication.api.RetrofitClient;
 import alex.myapplication.models.IdForm;
 import alex.myapplication.models.SignUpForm;
 import alex.myapplication.models.UserModel;
+import alex.myapplication.services.NetworkService;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -22,6 +24,27 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EditText editTextEmail, editTextPassword, editTextName;
+    private NetworkService networkService = NetworkService.getInstance();
+
+    private NetworkService.OnUserGetListener  userListener = new NetworkService.OnUserGetListener() {
+        @Override
+        public void onUserSuccess(final UserModel user) {
+            // Already Loggined or signed up
+            Log.d("Task activity", "loggined as:" + user.getLogin());
+            Toast.makeText(MainActivity.this, "Loggined as" + user.getLogin(), Toast.LENGTH_LONG).show();
+
+            // Go to tasks page
+            Intent intent = new Intent(MainActivity.this, TasksActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        }
+
+        @Override
+        public void onUserError(final Exception error) {
+            //ToDo : network disabled! - offline work
+            Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,40 +62,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // is already signed in?
         Log.d("Main activity", "try to sign up...");
-
-        Call<UserModel> call = RetrofitClient
-                .getInstance()
-                .getApi()
-                //ToDo real user id
-                .getUser();
-
-        call.enqueue(new Callback<UserModel>() {
-            @Override
-            public void onResponse(Call<UserModel> call, Response<UserModel> response) {
-                if (response.code() == HttpURLConnection.HTTP_OK) {
-                    // Already loggined
-                    UserModel dr = response.body();
-                    Log.d("Task activity", "Already loggined as:" + dr.getLogin());
-                    Toast.makeText(MainActivity.this, "Loggined as" + dr.getLogin(), Toast.LENGTH_LONG).show();
-
-                    // Go to tasks page
-                    Intent intent = new Intent(MainActivity.this, TasksActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-
-                } else if (response.code() == HttpURLConnection.HTTP_NOT_FOUND ||
-                        response.code() == HttpURLConnection.HTTP_FORBIDDEN
-                ) {
-                    // User not found
-                    Toast.makeText(MainActivity.this, "User already exist", Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<UserModel> call, Throwable t) {
-                Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
+        // ToDo: storage service!
+        networkService.getme(userListener);
     }
 
     private void signUp() {
@@ -105,39 +96,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
 
-        // sign up:
-        Call<UserModel> call = RetrofitClient
-                .getInstance()
-                .getApi()
-                .signup(new SignUpForm(name, email, password));
-
-        call.enqueue(new Callback<UserModel>() {
-            @Override
-            public void onResponse(Call<UserModel> call, Response<UserModel> response) {
-                if (response.code() == HttpURLConnection.HTTP_OK) {
-                    // Already loggined
-                    UserModel dr = response.body();
-                    Log.d("Sign up activity", "Was registerd as:" + dr.getLogin());
-                    Toast.makeText(MainActivity.this, "Loggined as" + dr.getLogin(), Toast.LENGTH_LONG).show();
-
-                    // Go to tasks page
-                    Intent intent = new Intent(MainActivity.this, TasksActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-
-                } else if (response.code() == HttpURLConnection.HTTP_NOT_FOUND ||
-                        response.code() == HttpURLConnection.HTTP_FORBIDDEN
-                        ) {
-                    // User not found
-                    Toast.makeText(MainActivity.this, "User already exist", Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<UserModel> call, Throwable t) {
-                Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
+        networkService.signup(new SignUpForm(name, email, password) , userListener);
     }
 
     @Override

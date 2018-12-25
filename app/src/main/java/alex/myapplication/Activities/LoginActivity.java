@@ -15,13 +15,34 @@ import alex.myapplication.api.RetrofitClient;
 import alex.myapplication.models.LoginForm;
 import alex.myapplication.models.SignUpForm;
 import alex.myapplication.models.UserModel;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import alex.myapplication.services.NetworkService;
+
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
     private EditText editTextEmail;
     private EditText editTextPassword;
+
+    private NetworkService networkService = NetworkService.getInstance();
+
+    private NetworkService.OnUserGetListener  userListener = new NetworkService.OnUserGetListener() {
+        @Override
+        public void onUserSuccess(final UserModel user) {
+            //  sign in
+            Log.d("Task activity", "loggined as:" + user.getLogin());
+            Toast.makeText(LoginActivity.this, "signed in as" + user.getLogin(), Toast.LENGTH_LONG).show();
+
+            // Go to tasks page
+            Intent intent = new Intent(LoginActivity.this, TasksActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        }
+
+        @Override
+        public void onUserError(final Exception error) {
+            //ToDo : network disabled! - offline work
+            Toast.makeText(LoginActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,41 +86,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
 
         // sign in:
-        Call<UserModel> call = RetrofitClient
-                .getInstance()
-                .getApi()
-                .signin(new LoginForm(email, password));
-
-        //ToDo: error's texts hardcode
-        call.enqueue(new Callback<UserModel>() {
-            @Override
-            public void onResponse(Call<UserModel> call, Response<UserModel> response) {
-                if (response.code() == HttpURLConnection.HTTP_OK) {
-                    // loggined
-                    UserModel dr = response.body();
-                    Log.d("Login activity", "Was signed in as:" + dr.getLogin());
-                    Toast.makeText(LoginActivity.this, "signed in as" + dr.getLogin(), Toast.LENGTH_LONG).show();
-
-                    // Go to tasks page
-                    Intent intent = new Intent(LoginActivity.this, TasksActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-
-                } else if (response.code() == HttpURLConnection.HTTP_NOT_FOUND ||
-                        response.code() == HttpURLConnection.HTTP_FORBIDDEN
-                ) {
-                    // User not found
-                    Toast.makeText(LoginActivity.this, "User not found! Please check login and password", Toast.LENGTH_LONG).show();
-                } else if (response.code() == HttpURLConnection.HTTP_BAD_REQUEST) {
-                    Toast.makeText(LoginActivity.this, "Some fields are incorrect! Please check login and password fields", Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<UserModel> call, Throwable t) {
-                Toast.makeText(LoginActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
+        networkService.signin(new LoginForm(email, password), userListener);
     }
     @Override
     public void onClick(View view) {

@@ -1,6 +1,7 @@
 package alex.myapplication.api;
 
 
+import alex.myapplication.models.ChangeUserDataForm;
 import alex.myapplication.models.DefaultResponse;
 import alex.myapplication.models.IdForm;
 import alex.myapplication.models.LoginForm;
@@ -18,27 +19,24 @@ import retrofit2.http.POST;
 public interface Api {
 
     @POST("signup")
-    Call<UserModel> signup(
+    Call<ResponseBody> signup(
             @Body SignUpForm body
     );
 
     @POST("signin")
-    Call<UserModel> signin(
+    Call<ResponseBody> signin(
             @Body LoginForm body
     );
 
     @POST("me/")
-    Call<DefaultResponse> updateUser(
-            @Field("password") String password,
-            @Field("newEmail") String newEmail,
-            @Field("newPassword") String newPassword,
-            @Field("newLogin") String newNickname
-    );
+    Call<ResponseBody> updateUser(
+            @Body ChangeUserDataForm updateForm
+            );
 
     @GET("me/")
     Call<ResponseBody> getUser();
 
     @DELETE("deleteuser/")
-    Call<DefaultResponse> deleteUser();
+    Call<ResponseBody> deleteUser();
 
 }
