@@ -21,7 +21,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText editTextEmail;
     private EditText editTextPassword;
 
-    private UserNetworkService userNetworkService = UserNetworkService.getInstance(this);
+    private UserNetworkService userNetworkService;
 
     private UserNetworkService.OnUserGetListener  userListener = new UserNetworkService.OnUserGetListener() {
         @Override
@@ -65,6 +65,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         findViewById(R.id.buttonLogin).setOnClickListener(this);
         findViewById(R.id.textViewRegister).setOnClickListener(this);
+
+        userNetworkService = UserNetworkService.getInstance(this.getApplicationContext());
     }
 
     @Override
