@@ -22,7 +22,24 @@
 
     <string name="SignUpActivity__err__emailEmpty">Email is required</string>
     <string name="SignUpActivity__err__passwordEmpty">Password is required</string>
+    <string name="SignUpActivity__err__loginEmpty">Login is required</string>
     <string name="SignUpActivity__err__loginingErr"> Logining failed! Password or email is incorrect!</string>
 
+
+    <!-- create task activity-->
+    <string name="CreatingTaskActivity__hint__title"> Task name </string>
+    <string name="CreatingTaskActivity__hint_descripion"> Task description </string>
+    <string name="CreatingTaskActivity__btnText_create"> Create task </string>
+
+    <string name="CreatingTaskActivity__err__nameEmpty">Task name is required</string>
+    <string name="CreatingTaskActivity__err__descriptionEmpty">Task description is required</string>
+
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
 
 </resources>

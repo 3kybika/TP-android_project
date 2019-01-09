@@ -1,2 +1,37 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="app_name">Органайзер</string>
+
+    <!-- Login Activity -->
+    <string name="LoginActivity__title__login">Логин</string>
+    <string name="LoginActivity__hint__email">Электронная почта</string>
+    <string name="LoginActivity__hint__password">Пароль</string>
+    <string name="LoginActivity__text__haveAccount">Нет аккаунта? Зарегестрируйтесь </string>
+    <string name="LoginActivity__btnText__LoginBtn">Логин</string>
+
+    <string name="LoginActivity__err__emailEmpty">Введите адрес электронной почты</string>
+    <string name="LoginActivity__err__passwordEmpty">Введите пароль</string>
+    <string name="LoginActivity__err__loginingErr"> Ошибка аутентификации! </string>
+
+    <!-- Sign up Activity -->
+    <string name="SignUpActivity__title__signup">Регистрация</string>
+    <string name="SignUpActivity__hint__email">Электронная почт</string>
+    <string name="SignUpActivity__hint__password">Пароль</string>
+    <string name="SignUpActivity__hint__login">Логин</string>
+    <string name="SignUpActivity__text__haveAccount">Уже есть аккаунт? Войти </string>
+    <string name="SignUpActivity__btnText__signupBtn">Зарегестрироваться</string>
+
+    <string name="SignUpActivity__err__emailEmpty">Введите адрес электронной почты</string>
+    <string name="SignUpActivity__err__passwordEmpty">Введите пароль</string>
+    <string name="SignUpActivity__err__loginEmpty">Введите Логин</string>
+    <string name="SignUpActivity__err__loginingErr">Пользователь с таким логином существует! Введите новый</string>
+
+
+
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+</resources>
