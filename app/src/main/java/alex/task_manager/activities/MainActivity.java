@@ -29,7 +29,7 @@ import alex.task_manager.services.NetworkServices.UserNetworkService;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EditText editTextEmail, editTextPassword, editTextName;
-    private UserNetworkService networkService = UserNetworkService.getInstance(this);
+    private UserNetworkService networkService;
 
     private UserNetworkService.OnUserGetListener  userListener = new UserNetworkService.OnUserGetListener() {
         @Override
@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // is already signed in?
         Log.d("Main activity", "try to sign up...");
         // ToDo: storage service!
+        networkService = UserNetworkService.getInstance(this.getApplicationContext());
         networkService.getme(userListener);
     }
 

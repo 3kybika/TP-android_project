@@ -24,7 +24,7 @@ public class CookieService extends BaseDbService implements CookieJar {
     private static final CookieService mInstance = new CookieService();
 
     public static CookieService getInstance(Context context) {
-        mInstance.context = context.getApplicationContext();
+        mInstance.context = context;
         return mInstance;
     }
 
