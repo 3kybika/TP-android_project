@@ -26,8 +26,8 @@ public class TasksActivity extends AppCompatActivity implements NavigationView.O
     private RecyclerView tasksRecyclerView;
     private TasksRvCursorAdapter tasksAdapter;
 
-    private TasksDbService tasksDbService = TasksDbService.getInstance(this);
-    private UserDbService usersDbService  = UserDbService.getInstance(this);
+    private TasksDbService tasksDbService;
+    private UserDbService usersDbService;
 
 
     @Override
@@ -54,6 +54,9 @@ public class TasksActivity extends AppCompatActivity implements NavigationView.O
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        tasksDbService = TasksDbService.getInstance(this.getApplicationContext());
+        usersDbService  = UserDbService.getInstance(this.getApplicationContext());
     }
 
     @Override

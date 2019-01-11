@@ -19,10 +19,10 @@ import static alex.task_manager.services.DbServices.Mappers.getTaskViewModelList
 
 public class TasksDbService extends BaseDbService {
 
-    private static TasksDbService mInstance;
+    private static TasksDbService mInstance = new TasksDbService();
 
     public static TasksDbService getInstance(Context context) {
-        mInstance.context = context.getApplicationContext();
+        mInstance.context = context;
         return mInstance;
     }
 

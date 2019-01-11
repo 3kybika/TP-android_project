@@ -13,7 +13,7 @@ import static alex.task_manager.services.DbServices.Mappers.userModelMapper;
 
 public class UserDbService extends BaseDbService {
 
-    private static UserDbService mInstance;
+    private static UserDbService mInstance = new UserDbService();
 
     public static UserDbService getInstance(Context context) {
         mInstance.context = context.getApplicationContext();
