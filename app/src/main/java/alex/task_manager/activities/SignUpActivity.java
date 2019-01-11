@@ -3,18 +3,9 @@ package alex.task_manager.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -26,7 +17,7 @@ import alex.task_manager.requests.SignUpForm;
 import alex.task_manager.services.NetworkServices.UserNetworkService;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EditText editTextEmail, editTextPassword, editTextName;
     private UserNetworkService networkService;
@@ -36,10 +27,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void onUserSuccess(final UserModel user) {
             // Already Loggined or signed up
             Log.d("Task activity", "loggined as:" + user.getLogin());
-            Toast.makeText(MainActivity.this, "Loggined as" + user.getLogin(), Toast.LENGTH_LONG).show();
+            Toast.makeText(SignUpActivity.this, "Loggined as" + user.getLogin(), Toast.LENGTH_LONG).show();
 
             // Go to tasks page
-            Intent intent = new Intent(MainActivity.this, TasksActivity.class);
+            Intent intent = new Intent(SignUpActivity.this, TasksActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
@@ -47,13 +38,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void onUserError(final Exception error) {
             //ToDo : network disabled! - offline work
-            Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(SignUpActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
         }
 
         @Override
         public void onForbidden(final DefaultResponse response){
             //ToDo Unhardcode
-            Toast.makeText(MainActivity.this, "", Toast.LENGTH_LONG).show();
+            Toast.makeText(SignUpActivity.this, "", Toast.LENGTH_LONG).show();
         }
 
         @Override

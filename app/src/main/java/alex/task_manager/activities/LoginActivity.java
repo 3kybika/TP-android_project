@@ -116,7 +116,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 signin();
                 break;
             case R.id.textViewRegister:
-                startActivity(new Intent(this, MainActivity.class));
+                startActivity(new Intent(this, SignUpActivity.class));
                 break;
             default:
                 hideKeyboard(view);
