@@ -20,9 +20,16 @@ public class UserDbService extends BaseDbService {
         return mInstance;
     }
 
+    // FixME: заглушка для создания таблицы
+    @Override
+    void checkInitialized() {
+        super.checkInitialized();
+        upgrade(helper.getWritableDatabase(), 0, 1);
+    }
+
     @Override
     public void createDatabase(SQLiteDatabase db) {
-        Log.d("Tasks Service", "onCreate database");
+        Log.d("User Service", "onCreate database");
         // создаем таблицу с полями
         db.execSQL("CREATE TABLE Users (" +
                 "_id INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -42,6 +49,7 @@ public class UserDbService extends BaseDbService {
     public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion != newVersion) {
             db.execSQL("DROP TABLE IF EXISTS Users;");
+            db.execSQL("DROP TABLE IF EXISTS LastUser;");
             createDatabase(db);
         }
     }
@@ -49,14 +57,14 @@ public class UserDbService extends BaseDbService {
         checkInitialized();
         SQLiteDatabase db = helper.getWritableDatabase();
 
-        db.execSQL(String.format("UPDATE Last_user SET user_id = %d WHERE _id = 0", UserId));
+        db.execSQL(String.format("UPDATE LastUser SET user_id = %d WHERE _id = 0", UserId));
     }
 
     public Integer getCurrentUserId() {
         checkInitialized();
         SQLiteDatabase db = helper.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("SELECT id FROM Last_user LIMIT 1;", null);
+        Cursor cursor = db.rawQuery("SELECT _id FROM LastUser LIMIT 1;", null);
 
         return getInt(cursor);
     }
@@ -69,7 +77,7 @@ public class UserDbService extends BaseDbService {
         Cursor cursor = db.rawQuery(
                     "SELECT id, login, email " +
                     "FROM Users " +
-                    "WHERE Users.id = (SELECT id FROM Last_user WHERE _id = 0);",
+                    "WHERE Users.id = (SELECT _id FROM LastUser WHERE _id = 0);",
                 null
                 );
         return userModelMapper(cursor);

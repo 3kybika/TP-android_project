@@ -26,6 +26,13 @@ public class TasksDbService extends BaseDbService {
         return mInstance;
     }
 
+    // FixME: заглушка для создания таблицы
+    @Override
+    void checkInitialized() {
+        super.checkInitialized();
+        upgrade(helper.getWritableDatabase(), 0, 1);
+    }
+
     @Override
     public void createDatabase(SQLiteDatabase db) {
         Log.d("Tasks Service", "onCreate database");
