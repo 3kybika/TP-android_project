@@ -11,24 +11,19 @@ import alex.task_manager.models.UserModel;
 import static alex.task_manager.services.DbServices.Mappers.getInt;
 import static alex.task_manager.services.DbServices.Mappers.userModelMapper;
 
-public class UserDbService extends BaseDbService {
+public class UserDbService {
 
-    private static UserDbService mInstance = new UserDbService();
+    Context context;
+    DatabaseManager dbManager;
+    private static final UserDbService mInstance = new UserDbService();
 
     public static UserDbService getInstance(Context context) {
-        mInstance.context = context.getApplicationContext();
+        mInstance.context = context;
+        mInstance.dbManager = DatabaseManager.getInstance(context);
         return mInstance;
     }
 
-    // FixME: заглушка для создания таблицы
-    @Override
-    void checkInitialized() {
-        super.checkInitialized();
-        upgrade(helper.getWritableDatabase(), 0, 1);
-    }
-
-    @Override
-    public void createDatabase(SQLiteDatabase db) {
+    public static void createDatabase(SQLiteDatabase db) {
         Log.d("User Service", "onCreate database");
         // создаем таблицу с полями
         db.execSQL("CREATE TABLE Users (" +
@@ -45,8 +40,7 @@ public class UserDbService extends BaseDbService {
         db.execSQL("INSERT INTO LastUser(_id, user_id) VALUES(0, -1);");
     }
 
-    @Override
-    public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    public static void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion != newVersion) {
             db.execSQL("DROP TABLE IF EXISTS Users;");
             db.execSQL("DROP TABLE IF EXISTS LastUser;");
@@ -54,15 +48,13 @@ public class UserDbService extends BaseDbService {
         }
     }
     public void setLastUser(Integer UserId){
-        checkInitialized();
-        SQLiteDatabase db = helper.getWritableDatabase();
+        SQLiteDatabase db = dbManager.getWritableDatabase();
 
         db.execSQL(String.format("UPDATE LastUser SET user_id = %d WHERE _id = 0", UserId));
     }
 
     public Integer getCurrentUserId() {
-        checkInitialized();
-        SQLiteDatabase db = helper.getReadableDatabase();
+        SQLiteDatabase db = dbManager.getReadableDatabase();
 
         Cursor cursor = db.rawQuery("SELECT _id FROM LastUser LIMIT 1;", null);
 
@@ -70,9 +62,8 @@ public class UserDbService extends BaseDbService {
     }
 
     public UserModel getCurrentUser(){
-        checkInitialized();
 
-        SQLiteDatabase db = helper.getReadableDatabase();
+        SQLiteDatabase db = dbManager.getReadableDatabase();
 
         Cursor cursor = db.rawQuery(
                     "SELECT id, login, email " +

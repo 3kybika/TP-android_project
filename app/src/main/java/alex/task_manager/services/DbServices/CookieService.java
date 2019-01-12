@@ -19,16 +19,20 @@ import okhttp3.HttpUrl;
 
 import static alex.task_manager.services.DbServices.Mappers.getCookieslList;
 
-public class CookieService extends BaseDbService implements CookieJar {
+public class CookieService implements CookieJar {
 
+    Context context;
+    DatabaseManager dbManager;
     private static final CookieService mInstance = new CookieService();
 
     public static CookieService getInstance(Context context) {
         mInstance.context = context;
+        mInstance.dbManager = DatabaseManager.getInstance(context);
         return mInstance;
     }
 
-    public void createDatabase(SQLiteDatabase db) {
+
+    public static void createDatabase(SQLiteDatabase db) {
         Log.d("Tasks Service", "onCreate database");
         // создаем таблицу с полями
         db.execSQL("CREATE TABLE Cookies (" +
@@ -45,8 +49,7 @@ public class CookieService extends BaseDbService implements CookieJar {
         );
     }
 
-    @Override
-    public void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    public static void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion != newVersion) {
             db.execSQL("DROP TABLE IF EXISTS Cookies;");
             createDatabase(db);
@@ -56,9 +59,8 @@ public class CookieService extends BaseDbService implements CookieJar {
     @Override
     public void saveFromResponse(@NonNull HttpUrl url, List<Cookie> cookies) {
         if (cookies != null) {
-            checkInitialized();
 
-            SQLiteDatabase database = helper.getWritableDatabase();
+            SQLiteDatabase database = dbManager.getWritableDatabase();
             for (Cookie cookie : cookies) {
 
                 ContentValues contentValues = new ContentValues();
@@ -81,10 +83,9 @@ public class CookieService extends BaseDbService implements CookieJar {
 
     @Override
     public List<Cookie> loadForRequest(HttpUrl url) {
-        checkInitialized();
 
         String selectQuery ="SELECT * FROM Cookies";
-        SQLiteDatabase database = helper.getReadableDatabase();
+        SQLiteDatabase database = dbManager.getReadableDatabase();
         Cursor cursor = database.rawQuery(selectQuery, null);
         return getCookieslList(cursor);
     }
