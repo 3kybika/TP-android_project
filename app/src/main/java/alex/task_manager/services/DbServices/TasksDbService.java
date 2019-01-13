@@ -66,23 +66,14 @@ public class TasksDbService {
 
     public Cursor getTaskCursorByPerformerId(int performerId) {
 
-        //createTask(new TaskModel(performerId, "Test task caption", "Test task description"));
-
-        Log.d("TaskDbManager", String.format("Get user with %d",performerId));
-        String selectQuery = "SELECT author_id FROM Tasks;";
         SQLiteDatabase database = dbManager.getReadableDatabase();
-        Cursor cursor = database.rawQuery(selectQuery, null);
-        cursor.moveToFirst();
-        long count = cursor.getLong(0);
-        Log.d("TaskDbManager", String.format("Tasks have author %d ",count));
-
-        selectQuery = String.format("SELECT COUNT(*) " +
+        String selectQuery = String.format("SELECT COUNT(*) " +
                 "FROM Tasks AS T " +
                 "INNER JOIN Users ON Users._id = T.author_id " +
                 "WHERE T.author_id = %d;",performerId);
-        cursor = database.rawQuery(selectQuery, null);
+        Cursor cursor = database.rawQuery(selectQuery, null);
         cursor.moveToFirst();
-        count = cursor.getInt(0);
+        long count = cursor.getInt(0);
         Log.d("TaskDbManager", String.format("Tasks have %d tasks user_id  ",count));
 
         selectQuery = String.format(

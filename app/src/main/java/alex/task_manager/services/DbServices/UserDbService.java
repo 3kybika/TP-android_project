@@ -59,7 +59,7 @@ public class UserDbService {
     public void setCurrentUser(UserModel user){
         SQLiteDatabase db = dbManager.getWritableDatabase();
 
-        db.execSQL(String.format("UPDATE LastUser SET user_id = %d WHERE _id = 0;", user.getId()));
+        db.execSQL(String.format("UPDATE LastUser SET user_id = %d LIMIT 1;", user.getId()));
         addUser(user);
     }
 
@@ -78,7 +78,7 @@ public class UserDbService {
         Cursor cursor = db.rawQuery(
                     "SELECT _id, login, email " +
                     "FROM Users " +
-                    "WHERE Users._id = (SELECT user_id FROM LastUser WHERE _id = 0);",
+                    "WHERE Users._id = (SELECT user_id FROM LastUser LIMIT 1);",
                 null
                 );
         return getUserModel(cursor);
