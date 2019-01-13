@@ -54,27 +54,45 @@ public class TasksDbService {
 
         ContentValues contentValues = new ContentValues();
         contentValues.put("author_id", task.getAuthorId());
-        contentValues.put("caption", task.getCaption());
+        contentValues.put("name", task.getCaption());
         contentValues.put("about", task.getAbout());
         contentValues.put("complited", task.isChecked());
 
         SQLiteDatabase database = dbManager.getWritableDatabase();
-        database.insert("Tasks", null, contentValues);
+        long rowID = database.insert("Tasks", null, contentValues);
+        Log.d("TaskDbManager", String.format("Created task with id %d",rowID));
         database.close();
     }
 
     public Cursor getTaskCursorByPerformerId(int performerId) {
 
+        //createTask(new TaskModel(performerId, "Test task caption", "Test task description"));
+
         Log.d("TaskDbManager", String.format("Get user with %d",performerId));
-        ArrayList<TaskViewModel> taskList = new ArrayList<TaskViewModel>();
-        String selectQuery = String.format(
+        String selectQuery = "SELECT author_id FROM Tasks;";
+        SQLiteDatabase database = dbManager.getReadableDatabase();
+        Cursor cursor = database.rawQuery(selectQuery, null);
+        cursor.moveToFirst();
+        long count = cursor.getLong(0);
+        Log.d("TaskDbManager", String.format("Tasks have author %d ",count));
+
+        selectQuery = String.format("SELECT COUNT(*) " +
+                "FROM Tasks AS T " +
+                "INNER JOIN Users ON Users._id = T.author_id " +
+                "WHERE T.author_id = %d;",performerId);
+        cursor = database.rawQuery(selectQuery, null);
+        cursor.moveToFirst();
+        count = cursor.getInt(0);
+        Log.d("TaskDbManager", String.format("Tasks have %d tasks user_id  ",count));
+
+        selectQuery = String.format(
                 "SELECT T._id, Users.login, T.name, T.about, T.complited " +
                         "FROM Tasks AS T " +
                         "INNER JOIN Users ON Users._id = T.author_id " +
                         "WHERE T.author_id = %d;",
                 performerId
         );
-        SQLiteDatabase database = dbManager.getReadableDatabase();
+        database = dbManager.getReadableDatabase();
         return database.rawQuery(selectQuery, null);
     }
 

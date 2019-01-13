@@ -1,12 +1,8 @@
 package alex.task_manager.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.support.v7.app.AppCompatActivity;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -14,55 +10,24 @@ import alex.task_manager.R;
 import alex.task_manager.models.DefaultResponse;
 import alex.task_manager.models.UserModel;
 import alex.task_manager.requests.SignUpForm;
+import alex.task_manager.services.DbServices.CookieService;
+import alex.task_manager.services.DbServices.UserDbService;
 import alex.task_manager.services.NetworkServices.UserNetworkService;
 
 
-public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
+public class SignUpActivity extends BaseAuthenticationActivity implements View.OnClickListener {
 
     private EditText editTextEmail, editTextPassword, editTextName;
-    private UserNetworkService networkService;
-
-    private UserNetworkService.OnUserGetListener  userListener = new UserNetworkService.OnUserGetListener() {
-        @Override
-        public void onUserSuccess(final UserModel user) {
-            // Already Loggined or signed up
-            Log.d("Task activity", "loggined as:" + user.getLogin());
-            Toast.makeText(SignUpActivity.this, "Loggined as" + user.getLogin(), Toast.LENGTH_LONG).show();
-
-            // Go to tasks page
-            Intent intent = new Intent(SignUpActivity.this, TasksActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-        }
-
-        @Override
-        public void onUserError(final Exception error) {
-            //ToDo : network disabled! - offline work
-            Toast.makeText(SignUpActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void onForbidden(final DefaultResponse response){
-            //ToDo Unhardcode
-            Toast.makeText(SignUpActivity.this, "", Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void onNotFound(final DefaultResponse response){
-
-        }
-    };
 
     @Override
     protected void onStart() {
         super.onStart();
-        // ToDo: Must it inspect: are already loggined in?
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_signup);
 
         // seaching for inputs
         editTextEmail = findViewById(R.id.editTextEmail);
@@ -73,11 +38,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         findViewById(R.id.buttonSignUp).setOnClickListener(this);
         findViewById(R.id.textViewLogin).setOnClickListener(this);
 
-        // is already signed in?
-        Log.d("Main activity", "try to sign up...");
-        // ToDo: storage service!
-        networkService = UserNetworkService.getInstance(this.getApplicationContext());
-        networkService.getme(userListener);
+        userNetworkService = UserNetworkService.getInstance(this.getApplicationContext());
+        userDbService = UserDbService.getInstance(this.getApplicationContext());
+        cookieService = CookieService.getInstance(this.getApplicationContext());
     }
 
     private void signUp() {
@@ -110,14 +73,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             return;
         }
 
-        networkService.signup(new SignUpForm(name, email, password) , userListener);
-    }
-
-    private static void hideKeyboard(final View input) {
-        final InputMethodManager inputMethodManager = (InputMethodManager) input.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (inputMethodManager != null) {
-            inputMethodManager.hideSoftInputFromWindow(input.getWindowToken(), 0);
-        }
+        userNetworkService.signup(new SignUpForm(name, email, password), authentificateListener);
     }
 
     @Override
@@ -132,5 +88,56 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             default:
                 hideKeyboard(view);
         }
+    }
+
+    @Override
+    protected void changeToMainActivity(){
+        // Go to tasks page
+        Intent intent = new Intent(SignUpActivity.this, TasksActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+    }
+
+    @Override
+    protected void showErrorAboutUnavailable(Exception exception){
+        Toast.makeText(
+                SignUpActivity.this, getResources().getText(R.string.SignUpActivity__err__unavaibleErr),
+                Toast.LENGTH_LONG
+        ).show();
+    }
+
+    @Override
+    protected void showMsgAboutOfflineStage(Exception exception) {
+        UserModel user = userDbService.getCurrentUser();
+
+        Toast.makeText(
+                SignUpActivity.this,
+                String.format(
+                        getResources().getText(R.string.SignUpActivity__infoMsg__offlineMode) +
+                        user.getLogin()
+                 ),
+                Toast.LENGTH_LONG
+        ).show();
+    }
+
+    @Override
+    protected void showErrorAboutUncorrectValues(DefaultResponse responce) {
+        Toast.makeText(
+                SignUpActivity.this,
+                getResources().getText(R.string.SignUpActivity__infoMsg__offlineMode),
+                Toast.LENGTH_LONG
+        ).show();
+    }
+
+    @Override
+    protected void showSuccessMessage(UserModel user) {
+        Toast.makeText(
+                SignUpActivity.this,
+                String.format(
+                        getResources().getText(R.string.SignUpActivity__infoMsg__successLoggined) +
+                        user.getLogin()
+                ),
+                Toast.LENGTH_LONG
+        ).show();
     }
 }

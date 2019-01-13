@@ -10,6 +10,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -41,8 +42,7 @@ public class TasksActivity extends AppCompatActivity implements NavigationView.O
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                goToCreationTaskPage();
             }
         });
 
@@ -57,12 +57,14 @@ public class TasksActivity extends AppCompatActivity implements NavigationView.O
 
         tasksDbService = TasksDbService.getInstance(this.getApplicationContext());
         usersDbService  = UserDbService.getInstance(this.getApplicationContext());
+
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        updateList(tasksDbService.getTaskCursorByPerformerId(usersDbService.getCurrentUserId()));
+        initRecyclerView();
+
     }
 
     @Override
@@ -94,8 +96,27 @@ public class TasksActivity extends AppCompatActivity implements NavigationView.O
         return super.onOptionsItemSelected(item);
     }
 
+    private void initRecyclerView() {
+        tasksAdapter = new TasksRvCursorAdapter(
+                this.getApplicationContext(),
+                tasksDbService.getTaskCursorByPerformerId(usersDbService.getCurrentUserId())
+        );
+        updateList(tasksDbService.getTaskCursorByPerformerId(usersDbService.getCurrentUserId()));
+
+        tasksRecyclerView = findViewById(R.id.tasks_recycler_view);
+        tasksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        tasksRecyclerView.setAdapter(tasksAdapter);
+    }
+
     public void updateList(Cursor cursor) {
         tasksAdapter.changeCursor(cursor);
+    }
+
+    public void goToCreationTaskPage() {
+        // Go to tasks creation page
+        Intent intent = new Intent(TasksActivity.this, CreateTaskActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

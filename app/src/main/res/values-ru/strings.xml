@@ -11,6 +11,9 @@
     <string name="LoginActivity__err__emailEmpty">Введите адрес электронной почты</string>
     <string name="LoginActivity__err__passwordEmpty">Введите пароль</string>
     <string name="LoginActivity__err__loginingErr"> Ошибка аутентификации! </string>
+    <string name="LoginActivity__err__unavaibleErr"> Невозможно соединиться с сервером: пожалуйста, проверьте соединение с сетью!</string>
+    <string name="LoginActivity__infoMsg__offlineMode"> Невозможно соединиться с сервером! Работа в режиме оффлайн. Авторизован, как </string>
+    <string name="LoginActivity__infoMsg__successLoggined"> Авторизован, как </string>
 
     <!-- Sign up Activity -->
     <string name="SignUpActivity__title__signup">Регистрация</string>
@@ -24,8 +27,18 @@
     <string name="SignUpActivity__err__passwordEmpty">Введите пароль</string>
     <string name="SignUpActivity__err__loginEmpty">Введите Логин</string>
     <string name="SignUpActivity__err__loginingErr">Пользователь с таким логином существует! Введите новый</string>
+    <string name="SignUpActivity__err__unavaibleErr"> Невозможно соединиться с сервером: пожалуйста, проверьте соединение с сетью!</string>
+    <string name="SignUpActivity__infoMsg__offlineMode"> Невозможно соединиться с сервером! Работа в режиме оффлайн. Авторизован, как </string>
+    <string name="SignUpActivity__infoMsg__successLoggined"> Авторизован, как </string>
 
 
+    <!-- create task activity-->
+    <string name="CreatingTaskActivity__hint__title"> Task name </string>
+    <string name="CreatingTaskActivity__hint_descripion"> Task description </string>
+    <string name="CreatingTaskActivity__btnText_create"> Create task </string>
+
+    <string name="CreatingTaskActivity__err__nameEmpty">Task name is required</string>
+    <string name="CreatingTaskActivity__err__descriptionEmpty">Task description is required</string>
 
 
     <string name="navigation_drawer_open">Open navigation drawer</string>

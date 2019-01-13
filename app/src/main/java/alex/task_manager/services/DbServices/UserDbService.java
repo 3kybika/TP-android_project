@@ -27,13 +27,13 @@ public class UserDbService {
         Log.d("User Service", "onCreate database");
         // создаем таблицу с полями
         db.execSQL("CREATE TABLE Users (" +
-                "_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "_id INTEGER PRIMARY KEY," +
                 "login TEXT," +
                 "email TEXT" +
                 ");"
         );
         db.execSQL("CREATE TABLE LastUser (" +
-                "_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "_id INTEGER PRIMARY KEY," +
                 "user_id INTEGER" +
                 ")"
         );
@@ -47,10 +47,20 @@ public class UserDbService {
             createDatabase(db);
         }
     }
-    public void setLastUser(Integer UserId){
+    public void addUser(UserModel user) {
+        SQLiteDatabase db = dbManager.getWritableDatabase();
+        db.execSQL(String.format(
+                "REPLACE INTO Users (_id, login, email) " +
+                        "VALUES(%d, \"%s\", \"%s\");",
+                user.getId(), user.getLogin(), user.getEmail()
+        ));
+    }
+
+    public void setCurrentUser(UserModel user){
         SQLiteDatabase db = dbManager.getWritableDatabase();
 
-        db.execSQL(String.format("UPDATE LastUser SET user_id = %d WHERE _id = 0", UserId));
+        db.execSQL(String.format("UPDATE LastUser SET user_id = %d WHERE _id = 0;", user.getId()));
+        addUser(user);
     }
 
     public Integer getCurrentUserId() {
@@ -66,12 +76,12 @@ public class UserDbService {
         SQLiteDatabase db = dbManager.getReadableDatabase();
 
         Cursor cursor = db.rawQuery(
-                    "SELECT id, login, email " +
+                    "SELECT _id, login, email " +
                     "FROM Users " +
-                    "WHERE Users.id = (SELECT _id FROM LastUser WHERE _id = 0);",
+                    "WHERE Users._id = (SELECT _id FROM LastUser WHERE _id = 0);",
                 null
                 );
-        return userModelMapper(cursor);
+        return getUserModel(cursor);
     }
 
     public UserModel getUserModel(Cursor cursor){

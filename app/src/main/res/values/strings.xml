@@ -11,6 +11,10 @@
     <string name="LoginActivity__err__emailEmpty">Email is required</string>
     <string name="LoginActivity__err__passwordEmpty">Password is required</string>
     <string name="LoginActivity__err__loginingErr"> Logining failed! Password or email is incorrect!</string>
+    <string name="LoginActivity__err__unavaibleErr"> Could not connect to server! Please, check your internet connection!</string>
+    <string name="LoginActivity__infoMsg__offlineMode"> Could not connect to server! Working in offline mode. Authorized as </string>
+    <string name="LoginActivity__infoMsg__successLoggined"> Authorized as </string>
+
 
     <!-- Sign up Activity -->
     <string name="SignUpActivity__title__signup">Sign Up</string>
@@ -24,6 +28,9 @@
     <string name="SignUpActivity__err__passwordEmpty">Password is required</string>
     <string name="SignUpActivity__err__loginEmpty">Login is required</string>
     <string name="SignUpActivity__err__loginingErr"> Logining failed! Password or email is incorrect!</string>
+    <string name="SignUpActivity__err__unavaibleErr"> Could not connect to server! Please, check your internet connection!</string>
+    <string name="SignUpActivity__infoMsg__offlineMode"> Could not connect to server! Working in offline mode. Authorized as </string>
+    <string name="SignUpActivity__infoMsg__successLoggined"> Registered as </string>
 
 
     <!-- create task activity-->

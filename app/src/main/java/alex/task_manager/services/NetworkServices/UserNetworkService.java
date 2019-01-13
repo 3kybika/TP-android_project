@@ -34,7 +34,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class UserNetworkService {
 
     //private static final String BASE_URL = "http://95.142.47.111:8081/api/users/";
-    private static final String BASE_URL = "http://10.0.2.2:8081/api/users/";
+    public static final String BASE_URL = "http://10.0.2.2:8081/api/users/";
     private UsersApi api;
     private static final Gson GSON = new GsonBuilder().create();
 
