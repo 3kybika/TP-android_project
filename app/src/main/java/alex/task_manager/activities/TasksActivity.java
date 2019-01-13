@@ -136,10 +136,6 @@ public class TasksActivity extends AppCompatActivity implements NavigationView.O
 
         } else if (id == R.id.nav_send) {
 
-        } else if (id == R.id.fab) {
-            // Go to tasks page
-            Intent intent = new Intent(TasksActivity.this, CreateTaskActivity.class);
-            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

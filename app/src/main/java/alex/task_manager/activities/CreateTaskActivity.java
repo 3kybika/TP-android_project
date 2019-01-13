@@ -3,20 +3,16 @@ package alex.task_manager.activities;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import java.sql.Timestamp;
 import java.util.Calendar;
 
 import alex.task_manager.R;
@@ -24,7 +20,7 @@ import alex.task_manager.models.TaskModel;
 import alex.task_manager.services.DbServices.TasksDbService;
 import alex.task_manager.services.DbServices.UserDbService;
 
-public class CreateTaskActivity  extends AppCompatActivity implements View.OnClickListener {
+public class CreateTaskActivity  extends AppCompatActivity {
 
     private UserDbService userDbService;
     private TasksDbService tasksDbService;
@@ -44,19 +40,11 @@ public class CreateTaskActivity  extends AppCompatActivity implements View.OnCli
         calendarTextView = findViewById(R.id.dateTextTitle);
         alarmTimeTextView = findViewById(R.id.alarmText);
 
-        findViewById(R.id.resetTimeDeadlineBtn).setOnClickListener(this);
-        findViewById(R.id.todayBtn).setOnClickListener(this);
-        findViewById(R.id.tomorrowBtn).setOnClickListener(this);
-        findViewById(R.id.nextWeekBtn).setOnClickListener(this);
-        findViewById(R.id.setDataTimeBtn).setOnClickListener(this);
-        findViewById(R.id.resetTimeAlarmBtn).setOnClickListener(this);
-        findViewById(R.id.setTimeAlarmBtn).setOnClickListener(this);
-        findViewById(R.id.createTaskButton).setOnClickListener(this);
-
         userDbService = UserDbService.getInstance(this.getApplicationContext());
         tasksDbService = TasksDbService.getInstance(this.getApplicationContext());
 
         initCalendar();
+        initButtonHandlers();
     }
 
     @Override
@@ -159,6 +147,85 @@ public class CreateTaskActivity  extends AppCompatActivity implements View.OnCli
         calendar.clear();
     }
 
+    private void initButtonHandlers() {
+
+        View createTaskButton = findViewById(R.id.createTaskButton);
+        createTaskButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createTask();
+            }
+        });
+
+        View resetTimeAlarmBtn = findViewById(R.id.resetTimeAlarmBtn);
+        resetTimeAlarmBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resetDateTime();
+            }
+        });
+
+        View resetTimeDeadlineBtn = findViewById(R.id.resetTimeDeadlineBtn);
+        resetTimeDeadlineBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resetTimeAlarm();
+            }
+        });
+
+        View todayBtn = findViewById(R.id.todayBtn);
+        todayBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar tmpCalendar = Calendar.getInstance();
+
+                int date = tmpCalendar.get(Calendar.DAY_OF_MONTH);
+                int month = tmpCalendar.get(Calendar.MONTH);
+                int year = tmpCalendar.get(Calendar.YEAR);
+
+                calendar.set(Calendar.YEAR, date);
+                calendar.set(Calendar.MONTH, month);
+                calendar.set(Calendar.DAY_OF_MONTH, year);
+
+                updateDateTextView();
+            }
+        });
+
+        View tomorrowBtn = findViewById(R.id.tomorrowBtn);
+        tomorrowBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                calendar.add(Calendar.DAY_OF_YEAR, 1);
+                updateDateTextView();
+            }
+        });
+
+        View nextWeekBtn = findViewById(R.id.nextWeekBtn);
+        nextWeekBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                calendar.add(Calendar.MONTH, 1);
+                updateDateTextView();
+            }
+        });
+
+        View setDateTimeBtn = findViewById(R.id.setDateTimeBtn);
+        setDateTimeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startCalendarDialog();
+            }
+        });
+
+        View setTimeAlarmBtn = findViewById(R.id.setTimeAlarmBtn);
+        setTimeAlarmBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startTimeAlarmDialog();
+            }
+        });
+    }
+
     private void resetTimeAlarm() {
         calendar.set(Calendar.HOUR, -1);
         calendar.set(Calendar.MINUTE, -1);
@@ -172,50 +239,5 @@ public class CreateTaskActivity  extends AppCompatActivity implements View.OnCli
         calendar.set(Calendar.DAY_OF_MONTH, -1);
 
         alarmTimeTextView.setText("");
-    }
-
-    @Override
-    public void onClick(View view) {
-
-        switch (view.getId()) {
-            case R.id.createTaskButton:
-                createTask();
-                break;
-            case R.id.resetTimeAlarmBtn:
-                resetDateTime();
-                break;
-            case R.id.resetTimeDeadlineBtn:
-                resetTimeAlarm();
-                break;
-            case R.id.todayBtn:
-                Calendar tmpCalendar = Calendar.getInstance();
-
-                int date = tmpCalendar.get(Calendar.DAY_OF_MONTH);
-                int month = tmpCalendar.get(Calendar.MONTH);
-                int year = tmpCalendar.get(Calendar.YEAR);
-
-                calendar.set(Calendar.YEAR, date);
-                calendar.set(Calendar.MONTH, month);
-                calendar.set(Calendar.DAY_OF_MONTH, year);
-
-                updateDateTextView();
-                break;
-            case R.id.tomorrowBtn:
-                calendar.add(Calendar.DAY_OF_YEAR, 1);
-                updateDateTextView();
-                break;
-            case R.id.nextWeekBtn:
-                calendar.add(Calendar.MONTH, 1);
-                updateDateTextView();
-                break;
-            case R.id.setDataTimeBtn:
-                startCalendarDialog();
-                break;
-            case R.id.setTimeAlarmBtn:
-                startTimeAlarmDialog();
-                break;
-            default:
-                hideKeyboard(view);
-        }
     }
 }

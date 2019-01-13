@@ -81,7 +81,7 @@
             android:hint="@string/CreatingTaskActivity_btnText__nextWeek"
             />
         <Button
-            android:id="@+id/setDataTimeBtn"
+            android:id="@+id/setDateTimeBtn"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"

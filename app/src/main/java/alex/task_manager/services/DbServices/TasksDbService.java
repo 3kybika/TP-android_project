@@ -56,7 +56,7 @@ public class TasksDbService {
         contentValues.put("author_id", task.getAuthorId());
         contentValues.put("name", task.getCaption());
         contentValues.put("about", task.getAbout());
-        contentValues.put("complited", task.isChecked());
+        contentValues.put("complited", task.isChecked() ? 1 : 0);
 
         SQLiteDatabase database = dbManager.getWritableDatabase();
         long rowID = database.insert("Tasks", null, contentValues);
