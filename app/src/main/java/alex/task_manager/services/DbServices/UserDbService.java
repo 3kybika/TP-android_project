@@ -66,7 +66,7 @@ public class UserDbService {
     public Integer getCurrentUserId() {
         SQLiteDatabase db = dbManager.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("SELECT _id FROM LastUser LIMIT 1;", null);
+        Cursor cursor = db.rawQuery("SELECT user_id FROM LastUser LIMIT 1;", null);
 
         return getInt(cursor);
     }
@@ -78,7 +78,7 @@ public class UserDbService {
         Cursor cursor = db.rawQuery(
                     "SELECT _id, login, email " +
                     "FROM Users " +
-                    "WHERE Users._id = (SELECT _id FROM LastUser WHERE _id = 0);",
+                    "WHERE Users._id = (SELECT user_id FROM LastUser WHERE _id = 0);",
                 null
                 );
         return getUserModel(cursor);
