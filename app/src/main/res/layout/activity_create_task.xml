@@ -1,155 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<LinearLayout
+    android:id="@+id/linearLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_centerVertical="true"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="5dp"
+    android:orientation="vertical"
+    android:padding="10dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditText
+        android:id="@+id/editTextTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_title"
+        android:hint="@string/CreatingTaskActivity__hint__title" />
+    <EditText
+        android:id="@+id/editTextDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_description"
+        android:hint="@string/CreatingTaskActivity__hint__descripion"
+        android:inputType="textMultiLine"/>
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="100">
+        <TextView
+            android:id="@+id/dateTextTitle"
+            android:textSize="17sp"
+            android:layout_marginVertical="6sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5sp"
+            android:drawableLeft="@drawable/ic_calendar"
+            android:hint="@string/CreatingTaskActivity__hint__date"
+            android:layout_weight="98"/>
+        <Button
+            android:id="@+id/resetTimeDeadlineBtn"
+            android:layout_width="25sp"
+            android:layout_height="25sp"
+            android:layout_marginVertical="2sp"
+            android:layout_marginHorizontal="2sp"
+            android:background="@drawable/ic_remove"
+            android:layout_weight="2"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/btnLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        android:orientation="horizontal"
+        android:padding="0dp">
+
+        <Button
+            android:id="@+id/todayBtn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:textSize="10sp"
+            android:hint="@string/CreatingTaskActivity_btnText__today"
+            />
+        <Button
+            android:id="@+id/tomorrowBtn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:textSize="10sp"
+            android:hint="@string/CreatingTaskActivity_btnText__tomorrow"
+            />
+        <Button
+            android:id="@+id/nextWeekBtn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:textSize="10sp"
+            android:hint="@string/CreatingTaskActivity_btnText__nextWeek"
+            />
+        <Button
+            android:id="@+id/setDataTimeBtn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:textSize="10sp"
+            android:hint="@string/CreatingTaskActivity_btnText__select"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/alarmLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:orientation="vertical"
-        android:padding="10dp">
-
-        <EditText
-            android:id="@+id/editTextTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_title"
-            android:hint="@string/CreatingTaskActivity__hint__title" />
-        <EditText
-            android:id="@+id/editTextDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_description"
-            android:hint="@string/CreatingTaskActivity__hint__descripion"
-            android:inputType="textMultiLine"/>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:weightSum="100">
-            <TextView
-                android:id="@+id/dateTextTitle"
-                android:textSize="17sp"
-                android:layout_marginVertical="6sp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="5sp"
-                android:drawableLeft="@drawable/ic_calendar"
-                android:hint="@string/CreatingTaskActivity__hint__date"
-                android:layout_weight="98"/>
-            <Button
-                android:id="@+id/resetTimeDeadlineBtn"
-                android:layout_width="25sp"
-                android:layout_height="25sp"
-                android:layout_marginVertical="2sp"
-                android:layout_marginHorizontal="2sp"
-                android:background="@drawable/ic_remove"
-                android:layout_weight="2"
-                />
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/btnLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="0dp"
-            android:layout_marginRight="0dp"
-            android:orientation="horizontal"
-            android:padding="0dp">
-
-            <Button
-                android:id="@+id/todayBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:textSize="12sp"
-                android:hint="@string/CreatingTaskActivity_btnText__today"
-                />
-            <Button
-                android:id="@+id/tomorrowBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:textSize="12sp"
-                android:hint="@string/CreatingTaskActivity_btnText__tomorrow"
-                />
-            <Button
-                android:id="@+id/nextWeekBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:textSize="12sp"
-                android:hint="@string/CreatingTaskActivity_btnText__nextWeek"
-                />
-            <Button
-                android:id="@+id/setDataTimeBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:textSize="12sp"
-                android:hint="@string/CreatingTaskActivity_btnText__select"
-                />
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/alarmLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="0dp"
-            android:layout_marginRight="0dp"
-            android:orientation="horizontal"
-            android:padding="0dp"
-            android:weightSum="100">
-
-            <TextView
-                android:id="@+id/alarmText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="17sp"
-                android:drawableLeft="@drawable/ic_alarm"
-                android:hint="@string/CreatingTaskActivity__hint__alarm"
-                android:layout_weight="80"/>
-            <Button
-                android:id="@+id/resetTimeAlarmBtn"
-                android:layout_width="25sp"
-                android:layout_height="25sp"
-                android:background="@drawable/ic_remove"
-                android:layout_weight="1"
-                />
-
-            <Button
-                android:id="@+id/setTimeAlarmBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:hint="@string/CreatingTaskActivity_btnText__select"
-                android:layout_weight="15"
-                />
-
-        </LinearLayout>
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        android:orientation="horizontal"
+        android:padding="0dp"
+        android:weightSum="100">
 
         <TextView
-            android:id="@+id/line"
-            style="?android:attr/listSeparatorTextViewStyle"
-            android:paddingTop="10dp"
-            android:gravity="center_horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="40dp"
-            android:background="@color/colorPrimaryDark" />
+            android:id="@+id/alarmText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="17sp"
+            android:drawableLeft="@drawable/ic_alarm"
+            android:hint="@string/CreatingTaskActivity__hint__alarm"
+            android:layout_weight="80"/>
+        <Button
+            android:id="@+id/resetTimeAlarmBtn"
+            android:layout_width="25sp"
+            android:layout_height="25sp"
+            android:background="@drawable/ic_remove"
+            android:layout_weight="1"
+            />
 
         <Button
-            android:id="@+id/createTaskButton"
-            android:layout_width="match_parent"
+            android:id="@+id/setTimeAlarmBtn"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="15dp"
-            android:background="@color/colorPrimaryDark"
-            android:text="@string/CreatingTaskActivity__btnText__create"
-            android:textAllCaps="false"
-            android:textColor="@color/colorFormBackground" />
-
+            android:textSize="12sp"
+            android:hint="@string/CreatingTaskActivity_btnText__select"
+            android:layout_weight="15"
+            />
 
     </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+    <TextView
+        android:id="@+id/line"
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:paddingTop="10dp"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="40dp"
+        android:background="@color/colorPrimaryDark" />
+
+    <Button
+        android:id="@+id/createTaskButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="15dp"
+        android:background="@color/colorPrimaryDark"
+        android:text="@string/CreatingTaskActivity__btnText__create"
+        android:textAllCaps="false"
+        android:textColor="@color/colorFormBackground" />
+
+
+</LinearLayout>
