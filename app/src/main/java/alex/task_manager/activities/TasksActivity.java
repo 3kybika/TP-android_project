@@ -115,7 +115,6 @@ public class TasksActivity extends AppCompatActivity implements NavigationView.O
     public void goToCreationTaskPage() {
         // Go to tasks creation page
         Intent intent = new Intent(TasksActivity.this, CreateTaskActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
 
@@ -140,7 +139,6 @@ public class TasksActivity extends AppCompatActivity implements NavigationView.O
         } else if (id == R.id.fab) {
             // Go to tasks page
             Intent intent = new Intent(TasksActivity.this, CreateTaskActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
 

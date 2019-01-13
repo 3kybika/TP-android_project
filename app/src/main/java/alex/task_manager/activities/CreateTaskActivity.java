@@ -94,9 +94,7 @@ public class CreateTaskActivity  extends AppCompatActivity implements View.OnCli
                 Toast.LENGTH_LONG
         ).show();
 
-        Intent intent = new Intent(CreateTaskActivity.this, TasksActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
+        finish();
     }
 
     private static void hideKeyboard(final View input) {
