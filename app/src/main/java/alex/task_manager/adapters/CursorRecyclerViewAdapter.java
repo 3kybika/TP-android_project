@@ -5,6 +5,9 @@ import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.support.v7.widget.RecyclerView;
 
+import alex.task_manager.services.DbServices.TasksDbService;
+import alex.task_manager.services.DbServices.UserDbService;
+
 public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
         private Context mContext;
@@ -104,6 +107,7 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
             public void onChanged() {
                 super.onChanged();
                 mDataValid = true;
+                changeCursor(TasksDbService.getInstance(mContext).getTaskCursorByPerformerId(UserDbService.getInstance(mContext).getCurrentUserId()));
                 notifyDataSetChanged();
             }
 
