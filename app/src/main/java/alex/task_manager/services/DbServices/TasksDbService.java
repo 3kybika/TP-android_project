@@ -131,14 +131,14 @@ public class TasksDbService {
         SQLiteDatabase db = dbManager.getWritableDatabase();
 
         db.execSQL(String.format(
-                "UPDATE Tasks(name, about, complited, deadline) " +
-                "SET VALUES (\"%s\", \"%s\", %d, \"%s\")" +
+                "UPDATE Tasks " +
+                "SET name=\"%s\", about=\"%s\", completed=%d, deadline=\"%s\" " +
                 "WHERE _id = %d",
                 task.getCaption(),
                 task.getAbout(),
                 task.isChecked() ? 1 : 0,
                 task.getStringTime(),
-                task.getId()
+                id
             ));
 
     }
