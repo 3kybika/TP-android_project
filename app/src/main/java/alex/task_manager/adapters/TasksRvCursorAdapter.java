@@ -69,6 +69,8 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView
                     if (prevChecked != isChecked) {
                         prevChecked = isChecked;
                         TasksDbService.getInstance(buttonView.getContext()).setCompleted(id, isChecked);
+
+                        adapter.updateCursor();
                     }
                 }
             });
