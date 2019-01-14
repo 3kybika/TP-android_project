@@ -3,11 +3,13 @@ package alex.task_manager.activities;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -33,6 +35,9 @@ public class CreateTaskActivity  extends AppCompatActivity {
 
     Calendar calendar = Calendar.getInstance();
 
+    private boolean editing = false;
+    private int id;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,17 +47,34 @@ public class CreateTaskActivity  extends AppCompatActivity {
         taskDescriptionEditText = findViewById(R.id.editTextDescription);
         calendarTextView = findViewById(R.id.dateTextTitle);
         alarmTimeTextView = findViewById(R.id.alarmText);
+        Button createTaskButton = findViewById(R.id.createTaskButton);
 
-        userDbService = UserDbService.getInstance(this.getApplicationContext());
+                userDbService = UserDbService.getInstance(this.getApplicationContext());
         tasksDbService = TasksDbService.getInstance(this.getApplicationContext());
 
         initCalendar();
         initButtonHandlers();
+
+        // recieving data
+        Intent intent = getIntent();
+        id = intent.getIntExtra("task_id", -1);
+        if (id != -1) {
+            editing = true;
+            TaskModel task = TasksDbService.getInstance(getApplicationContext()).getTaskById(id);
+            fillFieldsWithTask(task);
+        }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+    }
+
+    private void fillFieldsWithTask(TaskModel task) {
+        taskTitleEditText.setText(task.getCaption());
+        taskDescriptionEditText.setText(task.getAbout());
+        calendar.setTime(task.getTime());
+        updateDateTextView();
     }
 
     public void createTask(){
@@ -76,18 +98,29 @@ public class CreateTaskActivity  extends AppCompatActivity {
         }
         Timestamp time = new Timestamp(calendar.getTime().getTime());
         Log.d("creating task", "Task's timestamp is" + time);
-        tasksDbService.createTask(new TaskModel(
+
+        TaskModel task = new TaskModel(
                 userDbService.getCurrentUserId(),
                 title,
                 description,
                 time
-        ));
+        );
 
-        Toast.makeText(
-                CreateTaskActivity.this,
-                getResources().getText(R.string.CreatingTaskActivity__infoMsg__successCreating),
-                Toast.LENGTH_LONG
-        ).show();
+        if (!editing) {
+            tasksDbService.createTask(task);
+            Toast.makeText(
+                    CreateTaskActivity.this,
+                    getResources().getText(R.string.CreatingTaskActivity__infoMsg__successCreating),
+                    Toast.LENGTH_LONG
+            ).show();
+        } else {
+            tasksDbService.updateTask(id, task);
+            Toast.makeText(
+                    CreateTaskActivity.this,
+                    getResources().getText(R.string.CreatingTaskActivity__infoMsg__successEditing),
+                    Toast.LENGTH_LONG
+            ).show();
+        }
 
         finish();
     }

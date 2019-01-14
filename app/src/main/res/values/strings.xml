@@ -36,7 +36,7 @@
     <!-- create task activity-->
     <string name="CreatingTaskActivity__hint__title"> Task name </string>
     <string name="CreatingTaskActivity__hint__descripion"> Task description </string>
-    <string name="CreatingTaskActivity__btnText__create"> Create task </string>
+    <string name="CreatingTaskActivity__btnText__create"> Save </string>
     <string name="CreatingTaskActivity__hint__date"> Date of a deadline </string>
     <string name="CreatingTaskActivity_btnText__today"> Today </string>
     <string name="CreatingTaskActivity_btnText__tomorrow"> Tomorrow </string>
@@ -45,6 +45,7 @@
     <string name="CreatingTaskActivity__hint__alarm"> Set alarm time </string>
     <string name="CreatingTaskActivity_btnText__reset"> Reset </string>
     <string name="CreatingTaskActivity__infoMsg__successCreating"> Task created! </string>
+    <string name="CreatingTaskActivity__infoMsg__successEditing"> Task saved! </string>
     CreatingTaskActivity__err__timeWithoutDate
 
     <string name="CreatingTaskActivity__err__nameEmpty">Task name is required</string>

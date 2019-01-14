@@ -80,6 +80,11 @@ public class TasksDbService {
         return database.rawQuery(selectQuery, null);
     }
 
+    public TaskModel getTaskById(int taskId) {
+        // FIXME: времиенная заглушка
+        return new TaskModel(taskId, 0, "Caption", "Description", false, new Timestamp(System.currentTimeMillis()));
+    }
+
     public List<TaskViewModel> getTaskByPerformerId(int performerId) {
 
         return getTaskViewModelList(getTaskCursorByPerformerId(performerId));
@@ -102,4 +107,7 @@ public class TasksDbService {
         return getTaskViewModelList(cursor);
     }
 
+    public void updateTask(int id, TaskModel task) {
+        // TODO: implement
+    }
 }
