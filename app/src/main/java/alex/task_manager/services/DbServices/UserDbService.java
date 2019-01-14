@@ -59,7 +59,7 @@ public class UserDbService {
     public void setCurrentUser(UserModel user){
         SQLiteDatabase db = dbManager.getWritableDatabase();
 
-        db.execSQL(String.format("UPDATE LastUser SET user_id = %d;", user.getId()));
+        db.execSQL(String.format("UPDATE LastUser SET user_id = %d WHERE _id=0;", user.getId()));
         addUser(user);
     }
 
