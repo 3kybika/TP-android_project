@@ -169,6 +169,8 @@ public class CreateTaskActivity  extends AppCompatActivity {
                     calendar,
                     TimestampUtils.USER_FRIENDLY_TIME_FORMAT
             ));
+        } else {
+            alarmTimeTextView.setText("");
         }
     }
 
@@ -181,6 +183,8 @@ public class CreateTaskActivity  extends AppCompatActivity {
                     calendar,
                     TimestampUtils.USER_FRIENDLY_DATE_FORMAT
             ));
+        } else {
+            calendarTextView.setText("");
         }
     }
 
