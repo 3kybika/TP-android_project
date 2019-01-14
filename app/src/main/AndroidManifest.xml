@@ -31,7 +31,8 @@
         </activity>
         <activity
             android:name=".activities.CreateTaskActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:noHistory="true">
         </activity>
     </application>
 

@@ -13,6 +13,10 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Handler;
+
 import alex.task_manager.R;
 import alex.task_manager.activities.CreateTaskActivity;
 import alex.task_manager.models.TaskViewModel;
@@ -32,25 +36,22 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView
         super(context,cursor);
     }
 
-    class TaskDetailedViewHolder extends RecyclerView.ViewHolder {
-        private CheckBox TaskTitle;
-        private TextView descriptionTextView;
-        private TextView authorTextView;
-        private TextView deadlineTextView;
-        private ImageView taskEditBtn;
-        private int id;
-        private TasksRvCursorAdapter adapter;
+    abstract class TaskBaseViewHolder extends RecyclerView.ViewHolder {
+        CheckBox TaskTitle;
+        ImageView taskEditBtn;
+        int id;
+        TasksRvCursorAdapter adapter;
+        TextView deadlineTextView;
+        boolean prevChecked;
 
-        public TaskDetailedViewHolder(View itemView, final TasksRvCursorAdapter adapter) {
+        TaskBaseViewHolder(final View itemView, final TasksRvCursorAdapter adapter) {
             super(itemView);
 
             this.adapter = adapter;
 
             TaskTitle = itemView.findViewById(R.id.task_title);
-            descriptionTextView = itemView.findViewById(R.id.task_description);
-            authorTextView = itemView.findViewById(R.id.taskAuthor);
-            deadlineTextView = itemView.findViewById(R.id.task_deadline);
             taskEditBtn = itemView.findViewById(R.id.task_edit_btn);
+            deadlineTextView = itemView.findViewById(R.id.task_deadline);
 
             taskEditBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -61,19 +62,13 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView
                 }
             });
 
-
-
             TaskTitle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    TasksDbService.getInstance(buttonView.getContext()).setCompleted(id, isChecked);
-                }
-            });
-
-            itemView.findViewById(R.id.clickable_layout).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    TaskDetailedViewHolder.this.adapter.setSelectedItem(-1);
+                    if (prevChecked != isChecked) {
+                        prevChecked = isChecked;
+                        TasksDbService.getInstance(buttonView.getContext()).setCompleted(id, isChecked);
+                    }
                 }
             });
         }
@@ -87,53 +82,50 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView
             TaskTitle.setChecked(task.isComplited());
             id = task.getId();
         }
+
+        TasksRvCursorAdapter getAdapter() {
+            return adapter;
+        }
     }
 
-    class TasksMinimalViewHolder extends RecyclerView.ViewHolder {
-        private CheckBox TaskTitle;
-        private ImageView taskEditBtn;
-        private int id;
-        private TasksRvCursorAdapter adapter;
-        private TextView deadlineTextView;
+    class TaskDetailedViewHolder extends TaskBaseViewHolder {
+        TextView descriptionTextView;
+        TextView authorTextView;
+        TextView deadlineTextView;
 
-        public TasksMinimalViewHolder(View itemView, TasksRvCursorAdapter adapter) {
-            super(itemView);
+        TaskDetailedViewHolder(View itemView, final TasksRvCursorAdapter adapter) {
+            super(itemView, adapter);
 
-            this.adapter = adapter;
-
-            TaskTitle = itemView.findViewById(R.id.task_title);
-            taskEditBtn = itemView.findViewById(R.id.task_edit_btn);
+            descriptionTextView = itemView.findViewById(R.id.task_description);
+            authorTextView = itemView.findViewById(R.id.taskAuthor);
             deadlineTextView = itemView.findViewById(R.id.task_deadline);
-
-            taskEditBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(v.getContext(), CreateTaskActivity.class);
-                    intent.putExtra("task_id", id);
-                    v.getContext().startActivity(intent);
-                }
-            });
-
-            TaskTitle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    TasksDbService.getInstance(buttonView.getContext()).setCompleted(id, isChecked);
-                }
-            });
 
             itemView.findViewById(R.id.clickable_layout).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    TasksMinimalViewHolder.this.adapter.setSelectedItem(TasksMinimalViewHolder.this.getAdapterPosition());
+                    getAdapter().setSelectedItem(-1);
                 }
             });
         }
 
         public void bind(TaskViewModel task) {
-            TaskTitle.setText(task.getCaption());
-            TaskTitle.setChecked(task.isChecked());
+            super.bind(task);
+            descriptionTextView.setText(task.getAbout());
+            authorTextView.setText(task.getAuthor());
             deadlineTextView.setText(timestampToString(task.getTime(),TimestampUtils.USER_FRIENDLY_DATE_FORMAT));
-            id = task.getId();
+        }
+    }
+
+    class TasksMinimalViewHolder extends TaskBaseViewHolder {
+        TasksMinimalViewHolder(View itemView, TasksRvCursorAdapter adapter) {
+            super(itemView, adapter);
+
+            itemView.findViewById(R.id.clickable_layout).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getAdapter().setSelectedItem(TasksMinimalViewHolder.this.getAdapterPosition());
+                }
+            });
         }
     }
 
@@ -144,7 +136,7 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView
         if (prev != -1) {
             notifyItemChanged(prev);
         }
-        
+
         if (pos != -1) {
             notifyItemChanged(pos);
         }
