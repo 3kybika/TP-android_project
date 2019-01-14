@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +22,7 @@ import alex.task_manager.R;
 import alex.task_manager.adapters.TasksRvCursorAdapter;
 import alex.task_manager.services.DbServices.TasksDbService;
 import alex.task_manager.services.DbServices.UserDbService;
+import alex.task_manager.adapters.SwipeToDeleteCallback;
 
 public class TasksActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -106,6 +108,11 @@ public class TasksActivity extends AppCompatActivity implements NavigationView.O
         tasksRecyclerView = findViewById(R.id.tasks_recycler_view);
         tasksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         tasksRecyclerView.setAdapter(tasksAdapter);
+
+        ItemTouchHelper itemTouchHelper = new
+                ItemTouchHelper(new SwipeToDeleteCallback(tasksAdapter));
+
+        itemTouchHelper.attachToRecyclerView(tasksRecyclerView);
     }
 
     public void updateList(Cursor cursor) {
