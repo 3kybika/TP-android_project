@@ -40,7 +40,7 @@ public class TasksDbService {
                 "about TEXT," +
                 "author_id," +
                 "deadline TIMESTAMP DEFAULT NULL," +
-                "complited INTEGER" +
+                "completed INTEGER" +
             ");"
         );
     }
@@ -58,7 +58,7 @@ public class TasksDbService {
         contentValues.put("author_id", task.getAuthorId());
         contentValues.put("name", task.getCaption());
         contentValues.put("about", task.getAbout());
-        contentValues.put("complited", task.isChecked() ? 1 : 0);
+        contentValues.put("completed", task.isChecked() ? 1 : 0);
         contentValues.put("deadline", task.getStringTime());
 
         Log.d("TaskDbManager", task.getStringTime());
@@ -72,7 +72,7 @@ public class TasksDbService {
     public Cursor getTaskCursorByPerformerId(int performerId) {
 
         String selectQuery = String.format(
-                "SELECT T._id, Users.login, T.name, T.about, T.complited, T.deadline " +
+                "SELECT T._id, Users.login, T.name, T.about, T.completed, T.deadline " +
                         "FROM Tasks AS T " +
                         "INNER JOIN Users ON Users._id = T.author_id " +
                         "WHERE T.author_id = %d;",
@@ -84,7 +84,7 @@ public class TasksDbService {
 
     public TaskModel getTaskById(int taskId) {
         String selectQuery = String.format(
-                "SELECT T._id, T.author_id, T.name, T.about, T.complited, T.deadline " +
+                "SELECT T._id, T.author_id, T.name, T.about, T.completed, T.deadline " +
                         "FROM Tasks AS T " +
                         "WHERE T._id = %d;",
                 taskId
@@ -93,10 +93,11 @@ public class TasksDbService {
         return getTaskModel(database.rawQuery(selectQuery, null));
     }
 
-    public void setComplited(int id, boolean completed) {
+    public void setCompleted(int id, boolean completed) {
         String updateQuery = String.format(
-                "UPDATE Tasks(complited) SET VALUES(%d)" +
-                        "WHERE _id = %d",
+                "UPDATE Tasks " +
+                "SET completed=%d " +
+                "WHERE _id = %d",
                 boolToInt(completed),
                 id
         );
