@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import java.sql.Timestamp;
@@ -14,10 +13,6 @@ import java.util.List;
 import alex.task_manager.models.TaskModel;
 import alex.task_manager.models.TaskViewModel;
 import alex.task_manager.utils.TimestampUtils;
-
-import static alex.task_manager.services.DbServices.Mappers.boolToInt;
-import static alex.task_manager.services.DbServices.Mappers.getTaskModel;
-import static alex.task_manager.services.DbServices.Mappers.getTaskViewModelList;
 
 public class TasksDbService {
 
@@ -40,6 +35,9 @@ public class TasksDbService {
                 "about TEXT," +
                 "author_id," +
                 "deadline TIMESTAMP DEFAULT NULL," +
+                "notification_time TIMESTAMP DEFAULT NULL," +
+                "last_update_time TIMESTAMP NOT NULL," +
+                "deleted INTEGER DEFAULT 0," +
                 "completed INTEGER" +
             ");"
         );
@@ -53,15 +51,15 @@ public class TasksDbService {
     }
 
     public void createTask(TaskModel task) {
-
         ContentValues contentValues = new ContentValues();
+
         contentValues.put("author_id", task.getAuthorId());
-        contentValues.put("name", task.getCaption());
+        contentValues.put("name", task.getName());
         contentValues.put("about", task.getAbout());
         contentValues.put("completed", task.isChecked() ? 1 : 0);
-        contentValues.put("deadline", task.getStringTime());
-
-        Log.d("TaskDbManager", task.getStringTime());
+        contentValues.put("deadline", task.getStringDeadline());
+        contentValues.put("notification_time", task.getStringNotificationTime());
+        contentValues.put("last_update_time", TimestampUtils.getNowString(TimestampUtils.FULL_DATE_FORMAT));
 
         SQLiteDatabase database = dbManager.getWritableDatabase();
         long rowID = database.insert("Tasks", null, contentValues);
@@ -69,10 +67,10 @@ public class TasksDbService {
         database.close();
     }
 
-    public Cursor getTaskCursorByPerformerId(int performerId) {
+    public Cursor getTaskModelCursorByPerformerId(int performerId) {
 
         String selectQuery = String.format(
-                "SELECT T._id, Users.login, T.name, T.about, T.completed, T.deadline " +
+                "SELECT * " +
                         "FROM Tasks AS T " +
                         "INNER JOIN Users ON Users._id = T.author_id " +
                         "WHERE T.author_id = %d;",
@@ -82,15 +80,15 @@ public class TasksDbService {
         return database.rawQuery(selectQuery, null);
     }
 
-    public TaskModel getTaskById(int taskId) {
+    public Cursor getTaskModelCursorById(int taskId) {
         String selectQuery = String.format(
-                "SELECT T._id, T.author_id, T.name, T.about, T.completed, T.deadline " +
-                        "FROM Tasks AS T " +
-                        "WHERE T._id = %d;",
+                "SELECT * " +
+                "FROM Tasks AS T " +
+                "WHERE T._id = %d; ",
                 taskId
         );
         SQLiteDatabase database = dbManager.getReadableDatabase();
-        return getTaskModel(database.rawQuery(selectQuery, null));
+        return database.rawQuery(selectQuery, null);
     }
 
     public void setCompleted(int id, boolean completed) {
@@ -98,48 +96,27 @@ public class TasksDbService {
                 "UPDATE Tasks " +
                 "SET completed=%d " +
                 "WHERE _id = %d",
-                boolToInt(completed),
+                (completed ? 1:0),
                 id
         );
         SQLiteDatabase database = dbManager.getWritableDatabase();
         database.execSQL(updateQuery);
     }
 
-    public List<TaskViewModel> getTaskByPerformerId(int performerId) {
-
-        return getTaskViewModelList(getTaskCursorByPerformerId(performerId));
-    }
-
-    public List<TaskViewModel> getTaskByPerformerId(int performerId, Timestamp timePeriodBegin, Timestamp timePeriodEnd){
-        ArrayList<TaskViewModel> taskList = new ArrayList<TaskViewModel>();
-        String selectQuery = String.format(
-                        "SELECT T.id, U.name, T.caption, T.about, T.checked " +
-                        "FROM Tasks AS T " +
-                        "INNER JOIN Users AS U ON U.id = T.author_id " +
-                        "WHERE T.deadline < '%s' AND T.deadline > '%s' AND author_id = %;",
-
-                        TimestampUtils.timestampToString(timePeriodBegin, TimestampUtils.FULL_DATE_FORMAT),
-                        TimestampUtils.timestampToString(timePeriodEnd, TimestampUtils.FULL_DATE_FORMAT),
-                        performerId
-                );
-        SQLiteDatabase database = dbManager.getReadableDatabase();
-        Cursor cursor = database.rawQuery(selectQuery, null);
-        return getTaskViewModelList(cursor);
-    }
-
     public void updateTask(int id, TaskModel task) {
         SQLiteDatabase db = dbManager.getWritableDatabase();
 
         db.execSQL(String.format(
-                "UPDATE Tasks(name, about, complited, deadline) " +
-                "SET VALUES (\"%s\", \"%s\", %d, \"%s\")" +
+                "UPDATE Tasks(name, about, complited, deadline, notification_time, last_update_time) " +
+                "SET VALUES (\"%s\", \"%s\", %d, \"%s\", \"%s\", \"%s\")" +
                 "WHERE _id = %d",
-                task.getCaption(),
+                task.getName(),
                 task.getAbout(),
                 task.isChecked() ? 1 : 0,
-                task.getStringTime(),
+                task.getStringDeadline(),
+                task.getStringNotificationTime(),
+                TimestampUtils.getNowString(TimestampUtils.FULL_DATE_FORMAT),
                 task.getId()
             ));
-
     }
 }

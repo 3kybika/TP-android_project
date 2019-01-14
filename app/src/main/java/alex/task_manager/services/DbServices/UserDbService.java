@@ -8,8 +8,6 @@ import android.util.Log;
 
 import alex.task_manager.models.UserModel;
 
-import static alex.task_manager.services.DbServices.Mappers.getInt;
-import static alex.task_manager.services.DbServices.Mappers.userModelMapper;
 
 public class UserDbService {
 
@@ -68,7 +66,7 @@ public class UserDbService {
 
         Cursor cursor = db.rawQuery("SELECT user_id FROM LastUser LIMIT 1;", null);
 
-        return getInt(cursor);
+        return (new Mappers.IntegerMapper()).buildOneInstance(cursor);
     }
 
     public UserModel getCurrentUser(){
@@ -81,21 +79,6 @@ public class UserDbService {
                     "WHERE Users._id = (SELECT user_id FROM LastUser LIMIT 1);",
                 null
                 );
-        return getUserModel(cursor);
-    }
-
-    public UserModel getUserModel(Cursor cursor){
-        UserModel user;
-        if(cursor.moveToFirst()) {
-            try {
-                user = userModelMapper(cursor);
-            } finally {
-                cursor.close();
-            }
-        }
-        else{
-            return null;
-        }
-        return user;
+        return (new UserModel.Builder()).buildOneInstance(cursor);
     }
 }

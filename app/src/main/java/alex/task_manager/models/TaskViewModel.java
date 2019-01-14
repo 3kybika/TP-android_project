@@ -1,5 +1,7 @@
 package alex.task_manager.models;
 
+import android.database.Cursor;
+
 import java.sql.Timestamp;
 
 import alex.task_manager.utils.TimestampUtils;
@@ -7,20 +9,54 @@ import alex.task_manager.utils.TimestampUtils;
 import static alex.task_manager.utils.TimestampUtils.timestampToString;
 
 public class TaskViewModel {
+
     private int id;
     private String author;
-    private String caption;
+    private String name;
     private String about;
-    private boolean checked;
-    private Timestamp time;
+    private boolean complited;
+    private Timestamp deadline;
+    private Timestamp notificationTime;
+    private Timestamp lastChangeTime;
 
-    public TaskViewModel(int id, String author, String caption, String about, boolean checked, Timestamp time) {
+    public static final class Builder extends DbModelBuilder<TaskViewModel> {
+
+        @Override
+        protected TaskViewModel mapper(Cursor cursor) {
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+            String author = cursor.getString(cursor.getColumnIndexOrThrow("login"));
+            String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+            String about = cursor.getString(cursor.getColumnIndexOrThrow("about"));
+            boolean complited = toBoolean(cursor.getInt(cursor.getColumnIndexOrThrow("completed")));
+            Timestamp deadline = TimestampUtils.stringToTimestamp(cursor.getString(cursor.getColumnIndex("deadline")));
+
+            int index = cursor.getColumnIndex("notificationTime");
+            Timestamp notificationTime = index != -1 ? TimestampUtils.stringToTimestamp(cursor.getString(index)) : null;
+            index = cursor.getColumnIndex("lastChangeTime");
+            Timestamp lastChangeTime = index != -1 ? TimestampUtils.stringToTimestamp(cursor.getString(index)) : null;
+
+            return new TaskViewModel(id, author, name, about, complited, deadline, notificationTime, lastChangeTime);
+        }
+    }
+
+    public TaskViewModel(
+            int id,
+            String author,
+            String name,
+            String about,
+            boolean complited,
+            Timestamp deadline,
+            Timestamp notificationTime,
+            Timestamp lastChangeTime
+    ) {
         this.id = id;
         this.author = author;
-        this.caption = caption;
+        this.name = name;
         this.about = about;
-        this.checked = checked;
-        this.time = time;
+        this.complited = complited;
+        this.deadline = deadline;
+        this.notificationTime = notificationTime;
+        this.lastChangeTime = lastChangeTime;
     }
 
     public int getId() {
@@ -39,12 +75,12 @@ public class TaskViewModel {
         this.author = author;
     }
 
-    public String getCaption() {
-        return caption;
+    public String getName() {
+        return name;
     }
 
-    public void setCaption(String caption) {
-        this.caption = caption;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getAbout() {
@@ -55,23 +91,39 @@ public class TaskViewModel {
         this.about = about;
     }
 
-    public boolean isChecked() {
-        return checked;
+    public boolean isComplited() {
+        return complited;
     }
 
-    public void setChecked(boolean checked) {
-        this.checked = checked;
+    public void setComplited(boolean checked) {
+        this.complited = checked;
     }
 
-    public Timestamp getTime() {
-        return time;
+    public Timestamp getDeadline() {
+        return deadline;
     }
 
-    public void setTime(Timestamp time) {
-        this.time = time;
+    public void setDeadline(Timestamp deadline) {
+        this.deadline = deadline;
     }
 
-    public String getStringTime() {
-        return timestampToString(this.time, TimestampUtils.FULL_DATE_FORMAT);
+    public String getStringDeadline() {
+        return timestampToString(this.deadline, TimestampUtils.FULL_DATE_FORMAT);
+    }
+
+    public void setNotificationTime(Timestamp notificationTime) {
+        this.notificationTime = notificationTime;
+    }
+
+    public Timestamp getNotificationTime() {
+        return notificationTime;
+    }
+
+    public void setLastChangeTime(Timestamp lastChangeTime) {
+        this.lastChangeTime = lastChangeTime;
+    }
+
+    public Timestamp getLastChangeTime() {
+        return lastChangeTime;
     }
 }

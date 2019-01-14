@@ -8,7 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -21,7 +20,6 @@ import alex.task_manager.models.TaskViewModel;
 import alex.task_manager.services.DbServices.TasksDbService;
 import alex.task_manager.utils.TimestampUtils;
 
-import static alex.task_manager.services.DbServices.Mappers.taskViewModelMapper;
 import static alex.task_manager.utils.TimestampUtils.timestampToString;
 
 public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCursorAdapter.TaskViewHolder>{
@@ -65,11 +63,11 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCurso
 
         public void bind(TaskViewModel task) {
 
-            TaskTitle.setText(task.getCaption());
+            TaskTitle.setText(task.getName());
             descriptionTextView.setText(task.getAbout());
             authorTextView.setText(task.getAuthor());
-            deadlineTextView.setText(timestampToString(task.getTime(),TimestampUtils.USER_FRIENDLY_DATE_FORMAT));
-            TaskTitle.setChecked(task.isChecked());
+            deadlineTextView.setText(timestampToString(task.getDeadline(),TimestampUtils.USER_FRIENDLY_DATE_FORMAT));
+            TaskTitle.setChecked(task.isComplited());
             id = task.getId();
         }
     }
@@ -82,7 +80,7 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCurso
 
     @Override
     public void onBindViewHolder(TaskViewHolder viewHolder, Cursor cursor) {
-        TaskViewModel myListItem = taskViewModelMapper(cursor);
+        TaskViewModel myListItem = (new TaskViewModel.Builder()).buildCurrentInstance(cursor);
         viewHolder.bind(myListItem);
     }
 }

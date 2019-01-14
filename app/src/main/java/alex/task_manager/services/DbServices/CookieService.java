@@ -13,12 +13,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import alex.task_manager.models.DbModelBuilder;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
-
-import static alex.task_manager.services.DbServices.Mappers.getCookieslList;
-import static alex.task_manager.services.DbServices.Mappers.getInt;
 
 public class CookieService implements CookieJar {
 
@@ -32,6 +30,37 @@ public class CookieService implements CookieJar {
         return mInstance;
     }
 
+    public static final class Builder extends DbModelBuilder<Cookie> {
+
+        @Override
+        protected Cookie mapper(Cursor cursor) {
+            String name = cursor.getString(0); // name,
+            String  value = cursor.getString(1); // value,
+            Long expiresAt = cursor.getLong(2); // expiresAt,
+            String domain = cursor.getString(3); // domain,
+            String path = cursor.getString(4); // path,
+            Boolean secure = (cursor.getString(5).equals("True")); //secure,
+            Boolean httpOnly = (cursor.getString(6).equals("True")); //httpOnly,
+            Boolean hostOnly = (cursor.getString(7).equals("True")); //hostOnly,
+            Boolean persistent = (cursor.getString(8).equals("True")); //persistent
+
+
+            Cookie.Builder builder =  new Cookie.Builder();
+            builder.name(name); // name,
+            builder.value(value); // value,
+            builder.expiresAt(expiresAt); // expiresAt
+            builder.path(path); // path,
+
+            if (hostOnly) {  //hostonly
+                builder.hostOnlyDomain(domain); // domain,
+            }
+            else {
+                builder.domain(domain); // domain,
+            }
+
+            return builder.build();
+        }
+    }
 
     public static void createDatabase(SQLiteDatabase db) {
         Log.d("Tasks Service", "onCreate database");
@@ -95,14 +124,14 @@ public class CookieService implements CookieJar {
         String selectQuery ="SELECT * FROM Cookies;";
         SQLiteDatabase database = dbManager.getReadableDatabase();
         Cursor cursor = database.rawQuery(selectQuery, null);
-        return getCookieslList(cursor);
+        return (new CookieService.Builder()).buildListInstance(cursor);
     }
 
     public Boolean hasCookie(String url) {
         String selectQuery ="SELECT COUNT(*) FROM Cookies;";
         SQLiteDatabase database = dbManager.getReadableDatabase();
         Cursor cursor = database.rawQuery(selectQuery, null);
-        int count = getInt(cursor);
+        int count = (new Mappers.IntegerMapper()).buildOneInstance(cursor);
 
         return (count > 0);
     }

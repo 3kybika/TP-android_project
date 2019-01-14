@@ -99,9 +99,9 @@ public class TasksActivity extends AppCompatActivity implements NavigationView.O
     private void initRecyclerView() {
         tasksAdapter = new TasksRvCursorAdapter(
                 this.getApplicationContext(),
-                tasksDbService.getTaskCursorByPerformerId(usersDbService.getCurrentUserId())
+                tasksDbService.getTaskModelCursorByPerformerId(usersDbService.getCurrentUserId())
         );
-        updateList(tasksDbService.getTaskCursorByPerformerId(usersDbService.getCurrentUserId()));
+        updateList(tasksDbService.getTaskModelCursorByPerformerId(usersDbService.getCurrentUserId()));
 
         tasksRecyclerView = findViewById(R.id.tasks_recycler_view);
         tasksRecyclerView.setLayoutManager(new LinearLayoutManager(this));

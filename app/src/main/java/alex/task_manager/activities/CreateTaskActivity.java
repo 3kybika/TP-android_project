@@ -49,7 +49,7 @@ public class CreateTaskActivity  extends AppCompatActivity {
         alarmTimeTextView = findViewById(R.id.alarmText);
         Button createTaskButton = findViewById(R.id.createTaskButton);
 
-                userDbService = UserDbService.getInstance(this.getApplicationContext());
+        userDbService = UserDbService.getInstance(this.getApplicationContext());
         tasksDbService = TasksDbService.getInstance(this.getApplicationContext());
 
         initCalendar();
@@ -60,8 +60,11 @@ public class CreateTaskActivity  extends AppCompatActivity {
         id = intent.getIntExtra("task_id", -1);
         if (id != -1) {
             editing = true;
-            TaskModel task = TasksDbService.getInstance(getApplicationContext()).getTaskById(id);
-            fillFieldsWithTask(task);
+
+            TaskModel.Builder taskBuilder = new TaskModel.Builder();
+            fillFieldsWithTask(
+                    taskBuilder.buildOneInstance(tasksDbService.getTaskModelCursorById(id))
+            );
         }
     }
 
@@ -71,10 +74,10 @@ public class CreateTaskActivity  extends AppCompatActivity {
     }
 
     private void fillFieldsWithTask(TaskModel task) {
-        taskTitleEditText.setText(task.getCaption());
+        taskTitleEditText.setText(task.getName());
         taskDescriptionEditText.setText(task.getAbout());
-        if (task.getTime() != null) {
-            calendar.setTime(task.getTime());
+        if (task.getDeadline() != null) {
+            calendar.setTime(task.getDeadline());
             updateDateTextView();
         }
     }
@@ -98,14 +101,29 @@ public class CreateTaskActivity  extends AppCompatActivity {
             calendarTextView.setError(getString(R.string.CreatingTaskActivity__err__timeWithoutDate));
             return;
         }
-        Timestamp time = new Timestamp(calendar.getTime().getTime());
-        Log.d("creating task", "Task's timestamp is" + time);
+
+        Timestamp notificationTime = null;
+        Timestamp deadline = null;
+
+        if (calendar.isSet(Calendar.YEAR)
+                && calendar.isSet(Calendar.MONTH)
+                && calendar.isSet(Calendar.DAY_OF_MONTH)
+        ) {
+            calendar.set(Calendar.HOUR_OF_DAY,0);
+            calendar.set(Calendar.MINUTE,0);
+            deadline = new Timestamp(calendar.getTime().getTime());
+
+            if (calendar.isSet(Calendar.HOUR_OF_DAY) && calendar.isSet(Calendar.MINUTE)) {
+                notificationTime = new Timestamp(calendar.getTime().getTime());
+            }
+        }
 
         TaskModel task = new TaskModel(
                 userDbService.getCurrentUserId(),
                 title,
                 description,
-                time
+                deadline,
+                notificationTime
         );
 
         if (!editing) {
