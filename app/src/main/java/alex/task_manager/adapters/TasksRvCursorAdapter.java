@@ -4,7 +4,9 @@ package alex.task_manager.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +23,7 @@ import alex.task_manager.R;
 import alex.task_manager.activities.CreateTaskActivity;
 import alex.task_manager.models.TaskViewModel;
 import alex.task_manager.services.DbServices.TasksDbService;
+import alex.task_manager.services.DbServices.UserDbService;
 import alex.task_manager.utils.TimestampUtils;
 
 import static alex.task_manager.utils.TimestampUtils.timestampToString;
@@ -32,8 +35,11 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView
     private final static int TYPE_MINIMAL=1,
                              TYPE_DETAILED=2;
 
+    private Context mContext;
+
     public TasksRvCursorAdapter(Context context, Cursor cursor){
         super(context,cursor);
+        mContext = context;
     }
 
     abstract class TaskBaseViewHolder extends RecyclerView.ViewHolder {
@@ -87,6 +93,10 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView
 
         TasksRvCursorAdapter getAdapter() {
             return adapter;
+        }
+
+        int getId() {
+            return id;
         }
     }
 
@@ -187,4 +197,30 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView
     public int getItemViewType(int position) {
         return position == selectedItem ? TYPE_DETAILED : TYPE_MINIMAL;
     }
+
+    void updateCursor() {
+        changeCursor(TasksDbService.getInstance(mContext).getTaskCursorByPerformerId(UserDbService.getInstance(mContext).getCurrentUserId()));
+    }
+
+    public void removeItem(int position) {
+        int id = (int)getItemId(position);
+        TasksDbService.getInstance(mContext).removeTask(id);
+
+        updateCursor();
+        notifyItemRemoved(position);
+    }
+
+//    private void showUndoSnackbar() {
+//        View view = mActivity.findViewById(R.id.coordinator_layout);
+//        Snackbar snackbar = Snackbar.make(view, R.string.snack_bar_text,
+//                Snackbar.LENGTH_LONG);
+//        snackbar.setAction(R.string.snack_bar_undo, v -> undoDelete());
+//        snackbar.show();
+//    }
+//
+//    private void undoDelete() {
+//        mListItems.add(mRecentlyDeletedItemPosition,
+//                mRecentlyDeletedItem);
+//        notifyItemInserted(mRecentlyDeletedItemPosition);
+//    }
 }

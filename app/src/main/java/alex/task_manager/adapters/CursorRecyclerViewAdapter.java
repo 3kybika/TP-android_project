@@ -102,10 +102,6 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
             return oldCursor;
         }
 
-        void updateCursor() {
-            changeCursor(TasksDbService.getInstance(mContext).getTaskCursorByPerformerId(UserDbService.getInstance(mContext).getCurrentUserId()));
-        }
-
         private class NotifyingDataSetObserver extends DataSetObserver {
             @Override
             public void onChanged() {

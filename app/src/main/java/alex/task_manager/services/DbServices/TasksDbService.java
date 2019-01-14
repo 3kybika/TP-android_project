@@ -119,4 +119,15 @@ public class TasksDbService {
                 task.getId()
             ));
     }
+
+    public void removeTask(int id) {
+        SQLiteDatabase db = dbManager.getWritableDatabase();
+
+        db.execSQL(String.format(
+                "DELETE " +
+                "FROM Tasks " +
+                "WHERE _id=%d",
+                id
+        ));
+    }
 }
