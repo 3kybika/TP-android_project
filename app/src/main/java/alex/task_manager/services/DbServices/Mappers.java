@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import alex.task_manager.models.TaskModel;
 import alex.task_manager.models.TaskViewModel;
 import alex.task_manager.models.UserModel;
 import alex.task_manager.utils.TimestampUtils;
@@ -30,6 +31,11 @@ public class Mappers {
         return value.equals("True");
     }
 
+    public static int boolToInt(boolean value) {
+        return value ? 1 : 0 ;
+    }
+
+
 
     public static UserModel userModelMapper(Cursor cursor) {
         return new UserModel(
@@ -47,6 +53,18 @@ public class Mappers {
                 cursor.getString(3), //about;
                 toBoolean(cursor.getInt(4)), //checked;
                 TimestampUtils.stringToTimestamp(cursor.getString(5)) //deadline;
+        );
+    }
+
+    public static TaskModel getTaskModelMapper(Cursor cursor) {
+
+        return new TaskModel(
+                cursor.getInt(0), //_id
+                cursor.getInt(1), //author_id
+                cursor.getString(2), //caption
+                cursor.getString(3), //about
+                toBoolean(cursor.getInt(4)), //checked
+                TimestampUtils.stringToTimestamp(cursor.getString(5)) //deadline
         );
     }
 
@@ -80,7 +98,20 @@ public class Mappers {
         return builder.build();
     }
 
-
+    public static TaskModel getTaskModel(Cursor cursor) {
+        TaskModel task;
+        if(cursor.moveToFirst()) {
+            try {
+                task = getTaskModelMapper(cursor);
+            } finally {
+                cursor.close();
+            }
+        }
+        else{
+            return null;
+        }
+        return task;
+    }
 
     public static  List<TaskViewModel> getTaskViewModelList(Cursor cursor) {
         final List<TaskViewModel> resultList = new ArrayList<>();

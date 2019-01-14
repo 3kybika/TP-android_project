@@ -15,6 +15,8 @@ import alex.task_manager.models.TaskModel;
 import alex.task_manager.models.TaskViewModel;
 import alex.task_manager.utils.TimestampUtils;
 
+import static alex.task_manager.services.DbServices.Mappers.boolToInt;
+import static alex.task_manager.services.DbServices.Mappers.getTaskModel;
 import static alex.task_manager.services.DbServices.Mappers.getTaskViewModelList;
 
 public class TasksDbService {
@@ -81,8 +83,25 @@ public class TasksDbService {
     }
 
     public TaskModel getTaskById(int taskId) {
-        // FIXME: времиенная заглушка
-        return new TaskModel(taskId, 0, "Caption", "Description", false, new Timestamp(System.currentTimeMillis()));
+        String selectQuery = String.format(
+                "SELECT T._id, T.author_id, T.name, T.about, T.complited, T.deadline " +
+                        "FROM Tasks AS T " +
+                        "WHERE T._id = %d;",
+                taskId
+        );
+        SQLiteDatabase database = dbManager.getReadableDatabase();
+        return getTaskModel(database.rawQuery(selectQuery, null));
+    }
+
+    public void setComplited(int id, boolean completed) {
+        String updateQuery = String.format(
+                "UPDATE Tasks(complited) SET VALUES(%d)" +
+                        "WHERE _id = %d",
+                boolToInt(completed),
+                id
+        );
+        SQLiteDatabase database = dbManager.getWritableDatabase();
+        database.execSQL(updateQuery);
     }
 
     public List<TaskViewModel> getTaskByPerformerId(int performerId) {
