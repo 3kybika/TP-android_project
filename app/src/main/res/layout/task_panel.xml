@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:layout_margin="5dp"
     android:background="@color/colorFormBackground"
@@ -26,6 +26,15 @@
             android:text="Sample description"
             android:textColor="@color/textLightColour"
             />
+        <TextView
+            android:id="@+id/task_deadline"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:textSize="20sp"
+            android:layout_marginStart="5dp"
+            android:text="11.11.2011"
+            android:textColor="@color/textLightColour"
+            />
         <LinearLayout
             android:id="@+id/authorString"
             android:layout_width="match_parent"
@@ -37,7 +46,7 @@
             <TextView
                 android:id="@+id/taskAuthorTitle"
                 android:layout_width="70dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:textSize="15sp"
                 android:layout_marginStart="5dp"
                 android:text="Author:"
@@ -46,7 +55,7 @@
             <TextView
                 android:id="@+id/taskAuthor"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
+                android:layout_height="wrap_content"
                 android:textSize="15sp"
                 android:layout_marginStart="5dp"
                 android:text="Sample Author"

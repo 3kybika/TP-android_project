@@ -37,7 +37,7 @@ public class TasksDbService {
                 "name TEXT," +
                 "about TEXT," +
                 "author_id," +
-                "deadline TIMESTAMP," +
+                "deadline TIMESTAMP DEFAULT NULL," +
                 "complited INTEGER" +
             ");"
         );
@@ -57,6 +57,9 @@ public class TasksDbService {
         contentValues.put("name", task.getCaption());
         contentValues.put("about", task.getAbout());
         contentValues.put("complited", task.isChecked() ? 1 : 0);
+        contentValues.put("deadline", task.getStringTime());
+
+        Log.d("TaskDbManager", task.getStringTime());
 
         SQLiteDatabase database = dbManager.getWritableDatabase();
         long rowID = database.insert("Tasks", null, contentValues);
@@ -66,39 +69,20 @@ public class TasksDbService {
 
     public Cursor getTaskCursorByPerformerId(int performerId) {
 
-        SQLiteDatabase database = dbManager.getReadableDatabase();
-        String selectQuery = String.format("SELECT COUNT(*) " +
-                "FROM Tasks AS T " +
-                "INNER JOIN Users ON Users._id = T.author_id " +
-                "WHERE T.author_id = %d;",performerId);
-        Cursor cursor = database.rawQuery(selectQuery, null);
-        cursor.moveToFirst();
-        long count = cursor.getInt(0);
-        Log.d("TaskDbManager", String.format("Tasks have %d tasks user_id  ",count));
-
-        selectQuery = String.format(
-                "SELECT T._id, Users.login, T.name, T.about, T.complited " +
+        String selectQuery = String.format(
+                "SELECT T._id, Users.login, T.name, T.about, T.complited, T.deadline " +
                         "FROM Tasks AS T " +
                         "INNER JOIN Users ON Users._id = T.author_id " +
                         "WHERE T.author_id = %d;",
                 performerId
         );
-        database = dbManager.getReadableDatabase();
+        SQLiteDatabase database = dbManager.getReadableDatabase();
         return database.rawQuery(selectQuery, null);
     }
 
     public List<TaskViewModel> getTaskByPerformerId(int performerId) {
-        ArrayList<TaskViewModel> taskList = new ArrayList<TaskViewModel>();
-        String selectQuery = String.format(
-                "SELECT T._id, Users.login, T.name, T.about, T.complited " +
-                        "FROM Tasks AS T " +
-                        "INNER JOIN Users ON Users._id = T.author_id " +
-                        "WHERE T.author_id = %d;",
-                performerId
-        );
-        SQLiteDatabase database = dbManager.getReadableDatabase();
-        Cursor cursor = database.rawQuery(selectQuery, null);
-        return getTaskViewModelList(cursor);
+
+        return getTaskViewModelList(getTaskCursorByPerformerId(performerId));
     }
 
     public List<TaskViewModel> getTaskByPerformerId(int performerId, Timestamp timePeriodBegin, Timestamp timePeriodEnd){

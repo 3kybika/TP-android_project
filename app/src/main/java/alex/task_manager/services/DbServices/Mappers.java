@@ -9,6 +9,7 @@ import java.util.List;
 
 import alex.task_manager.models.TaskViewModel;
 import alex.task_manager.models.UserModel;
+import alex.task_manager.utils.TimestampUtils;
 import okhttp3.Cookie;
 
 public class Mappers {
@@ -44,7 +45,8 @@ public class Mappers {
                 cursor.getString(1), //author;
                 cursor.getString(2), //caption;
                 cursor.getString(3), //about;
-                toBoolean(cursor.getInt(4)) //checked;
+                toBoolean(cursor.getInt(4)), //checked;
+                TimestampUtils.stringToTimestamp(cursor.getString(5)) //deadline;
         );
     }
 

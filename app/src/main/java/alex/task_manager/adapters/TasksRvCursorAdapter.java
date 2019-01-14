@@ -13,8 +13,10 @@ import android.widget.TextView;
 import alex.task_manager.R;
 import alex.task_manager.models.TaskModel;
 import alex.task_manager.models.TaskViewModel;
+import alex.task_manager.utils.TimestampUtils;
 
 import static alex.task_manager.services.DbServices.Mappers.taskViewModelMapper;
+import static alex.task_manager.utils.TimestampUtils.timestampToString;
 
 public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCursorAdapter.TaskViewHolder>{
 
@@ -26,12 +28,14 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCurso
         private CheckBox TaskTitle;
         private TextView descriptionTextView;
         private TextView authorTextView;
+        private TextView deadlineTextView;
 
         public TaskViewHolder(View itemView) {
             super(itemView);
             TaskTitle = itemView.findViewById(R.id.task_title);
             descriptionTextView = itemView.findViewById(R.id.task_description);
             authorTextView = itemView.findViewById(R.id.taskAuthor);
+            deadlineTextView = itemView.findViewById(R.id.task_deadline);
         }
 
         public void bind(TaskViewModel task) {
@@ -39,6 +43,7 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCurso
             TaskTitle.setText(task.getCaption());
             descriptionTextView.setText(task.getAbout());
             authorTextView.setText(task.getAuthor());
+            deadlineTextView.setText(timestampToString(task.getTime(),TimestampUtils.USER_FRIENDLY_DATE_FORMAT));
         }
     }
 

@@ -1,6 +1,7 @@
 package alex.task_manager.adapters;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,9 @@ import java.util.List;
 
 import alex.task_manager.R;
 import alex.task_manager.models.TaskModel;
+import alex.task_manager.utils.TimestampUtils;
+
+import static alex.task_manager.utils.TimestampUtils.timestampToString;
 
 public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHolder> {
 
@@ -20,12 +24,14 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
         private CheckBox TaskTitle;
         private TextView descriptionTextView;
         private TextView authorTextView;
+        private TextView deadlineTextView;
 
         public TaskViewHolder(View itemView) {
             super(itemView);
             TaskTitle = itemView.findViewById(R.id.task_title);
             descriptionTextView = itemView.findViewById(R.id.task_description);
             authorTextView = itemView.findViewById(R.id.taskAuthor);
+            deadlineTextView = itemView.findViewById(R.id.task_deadline);
         }
 
         public void bind(TaskModel task) {
@@ -34,6 +40,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
             descriptionTextView.setText(task.getAbout());
             //ToDo - real author name
             authorTextView.setText(Integer.toString(task.getAuthorId()));
+            deadlineTextView.setText(timestampToString(task.getTime(),TimestampUtils.USER_FRIENDLY_DATE_FORMAT));
         }
     }
 

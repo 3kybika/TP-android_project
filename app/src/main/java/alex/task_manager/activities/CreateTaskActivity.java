@@ -5,6 +5,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
@@ -13,12 +14,14 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.sql.Timestamp;
 import java.util.Calendar;
 
 import alex.task_manager.R;
 import alex.task_manager.models.TaskModel;
 import alex.task_manager.services.DbServices.TasksDbService;
 import alex.task_manager.services.DbServices.UserDbService;
+import alex.task_manager.utils.TimestampUtils;
 
 public class CreateTaskActivity  extends AppCompatActivity {
 
@@ -61,19 +64,23 @@ public class CreateTaskActivity  extends AppCompatActivity {
             taskTitleEditText.requestFocus();
             return;
         }
-
-        if (description.isEmpty()) {
-            taskDescriptionEditText.setError("Password required");
-            taskDescriptionEditText.requestFocus();
+        if ((calendar.isSet(Calendar.HOUR_OF_DAY)
+                && calendar.isSet(Calendar.MINUTE))
+                && !(calendar.isSet(Calendar.YEAR)
+                && calendar.isSet(Calendar.MONTH)
+                && calendar.isSet(Calendar.DAY_OF_MONTH))
+         ) {
+            //ToDo: check this
+            calendarTextView.setError(getString(R.string.CreatingTaskActivity__err__timeWithoutDate));
             return;
         }
-
-        //dateTextView.setText(calendar.get(Calendar.MONTH) + ":" + calendar.get(Calendar.DAY_OF_MONTH))
-
+        Timestamp time = new Timestamp(calendar.getTime().getTime());
+        Log.d("creating task", "Task's timestamp is" + time);
         tasksDbService.createTask(new TaskModel(
                 userDbService.getCurrentUserId(),
                 title,
-                description
+                description,
+                time
         ));
 
         Toast.makeText(
@@ -93,22 +100,50 @@ public class CreateTaskActivity  extends AppCompatActivity {
     }
 
     private void startTimeAlarmDialog() {
-        new TimePickerDialog(
-                CreateTaskActivity.this,
-                timeDialogListener,
-                calendar.get(Calendar.HOUR_OF_DAY),
-                calendar.get(Calendar.MINUTE), true)
-                .show();
+        if (calendar.isSet(Calendar.HOUR_OF_DAY)
+                && calendar.isSet(Calendar.MINUTE)
+                ) {
+            new TimePickerDialog(
+                    CreateTaskActivity.this,
+                    timeDialogListener,
+                    calendar.get(Calendar.HOUR_OF_DAY),
+                    calendar.get(Calendar.MINUTE),
+                    true
+            ).show();
+        } else {
+            Calendar tmpCalendar = Calendar.getInstance();
+            new TimePickerDialog(
+                    CreateTaskActivity.this,
+                    timeDialogListener,
+                    tmpCalendar.get(Calendar.HOUR_OF_DAY),
+                    tmpCalendar.get(Calendar.MINUTE),
+                    true
+            ).show();
+        }
     }
 
     private void startCalendarDialog() {
-        new DatePickerDialog(
-                CreateTaskActivity.this,
-                calendarDialogListener,
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
-        ).show();
+        if (calendar.isSet(Calendar.YEAR)
+                && calendar.isSet(Calendar.MONTH)
+                && calendar.isSet(Calendar.DAY_OF_MONTH)
+        ) {
+            new DatePickerDialog(
+                    CreateTaskActivity.this,
+                    calendarDialogListener,
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+            ).show();
+        } else {
+            Calendar tmpCalendar = Calendar.getInstance();
+            new DatePickerDialog(
+                    CreateTaskActivity.this,
+                    calendarDialogListener,
+                    tmpCalendar.get(Calendar.YEAR),
+                    tmpCalendar.get(Calendar.MONTH),
+                    tmpCalendar.get(Calendar.DAY_OF_MONTH)
+            ).show();
+        }
     }
 
     TimePickerDialog.OnTimeSetListener timeDialogListener = new TimePickerDialog.OnTimeSetListener() {
@@ -129,18 +164,24 @@ public class CreateTaskActivity  extends AppCompatActivity {
     };
 
     private void setTime() {
-        alarmTimeTextView.setText(
-                "Hours:" + calendar.get(Calendar.HOUR) +
-                "Minutes:" + calendar.get(Calendar.MINUTE)
-        );
+        if (calendar.isSet(Calendar.HOUR_OF_DAY) && calendar.isSet(Calendar.MINUTE)) {
+            alarmTimeTextView.setText(TimestampUtils.calendarToString(
+                    calendar,
+                    TimestampUtils.USER_FRIENDLY_TIME_FORMAT
+            ));
+        }
     }
 
     private void  updateDateTextView() {
-        //ToDo: unhardcode
-        calendarTextView.setText(
-                "Year:  " + calendar.get(Calendar.YEAR) +
-                "Month: " + calendar.get(Calendar.MONTH) +
-                "Date:  " + calendar.get(Calendar.DAY_OF_MONTH));
+        if (calendar.isSet(Calendar.YEAR)
+                && calendar.isSet(Calendar.MONTH)
+                && calendar.isSet(Calendar.DAY_OF_MONTH)
+        ) {
+            calendarTextView.setText(TimestampUtils.calendarToString(
+                    calendar,
+                    TimestampUtils.USER_FRIENDLY_DATE_FORMAT
+            ));
+        }
     }
 
     private void initCalendar() {
@@ -195,7 +236,17 @@ public class CreateTaskActivity  extends AppCompatActivity {
         tomorrowBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                calendar.add(Calendar.DAY_OF_YEAR, 1);
+                Calendar tmpCalendar = Calendar.getInstance();
+                tmpCalendar.add(Calendar.DAY_OF_YEAR, 1);
+
+                int date = tmpCalendar.get(Calendar.DAY_OF_MONTH);
+                int month = tmpCalendar.get(Calendar.MONTH);
+                int year = tmpCalendar.get(Calendar.YEAR);
+
+                calendar.set(Calendar.YEAR, date);
+                calendar.set(Calendar.MONTH, month);
+                calendar.set(Calendar.DAY_OF_MONTH, year);
+
                 updateDateTextView();
             }
         });
@@ -204,12 +255,22 @@ public class CreateTaskActivity  extends AppCompatActivity {
         nextWeekBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                calendar.add(Calendar.MONTH, 1);
+                Calendar tmpCalendar = Calendar.getInstance();
+                tmpCalendar.add(Calendar.DAY_OF_YEAR, 7);
+
+                int date = tmpCalendar.get(Calendar.DAY_OF_MONTH);
+                int month = tmpCalendar.get(Calendar.MONTH);
+                int year = tmpCalendar.get(Calendar.YEAR);
+
+                calendar.set(Calendar.YEAR, date);
+                calendar.set(Calendar.MONTH, month);
+                calendar.set(Calendar.DAY_OF_MONTH, year);
+
                 updateDateTextView();
             }
         });
 
-        View setDateTimeBtn = findViewById(R.id.setDateTimeBtn);
+        View setDateTimeBtn = findViewById(R.id.setDateBtn);
         setDateTimeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

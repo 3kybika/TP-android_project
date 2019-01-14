@@ -44,12 +44,12 @@
     <string name="CreatingTaskActivity_btnText__select"> Select </string>
     <string name="CreatingTaskActivity__hint__alarm"> Set alarm time </string>
     <string name="CreatingTaskActivity_btnText__reset"> Reset </string>
-
     <string name="CreatingTaskActivity__infoMsg__successCreating"> Task created! </string>
-
+    CreatingTaskActivity__err__timeWithoutDate
 
     <string name="CreatingTaskActivity__err__nameEmpty">Task name is required</string>
     <string name="CreatingTaskActivity__err__descriptionEmpty">Task description is required</string>
+    <string name="CreatingTaskActivity__err__timeWithoutDate"> You set time but date was not specified! </string>
 
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
