@@ -73,8 +73,10 @@ public class CreateTaskActivity  extends AppCompatActivity {
     private void fillFieldsWithTask(TaskModel task) {
         taskTitleEditText.setText(task.getCaption());
         taskDescriptionEditText.setText(task.getAbout());
-        calendar.setTime(task.getTime());
-        updateDateTextView();
+        if (task.getTime() != null) {
+            calendar.setTime(task.getTime());
+            updateDateTextView();
+        }
     }
 
     public void createTask(){

@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,6 +18,7 @@ import alex.task_manager.R;
 import alex.task_manager.activities.CreateTaskActivity;
 import alex.task_manager.models.TaskModel;
 import alex.task_manager.models.TaskViewModel;
+import alex.task_manager.services.DbServices.TasksDbService;
 import alex.task_manager.utils.TimestampUtils;
 
 import static alex.task_manager.services.DbServices.Mappers.taskViewModelMapper;
@@ -52,6 +54,13 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCurso
                     v.getContext().startActivity(intent);
                 }
             });
+
+            TaskTitle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    TasksDbService.getInstance(buttonView.getContext()).setCompleted(id, isChecked);
+                }
+            });
         }
 
         public void bind(TaskViewModel task) {
@@ -60,6 +69,7 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCurso
             descriptionTextView.setText(task.getAbout());
             authorTextView.setText(task.getAuthor());
             deadlineTextView.setText(timestampToString(task.getTime(),TimestampUtils.USER_FRIENDLY_DATE_FORMAT));
+            TaskTitle.setChecked(task.isChecked());
             id = task.getId();
         }
     }
