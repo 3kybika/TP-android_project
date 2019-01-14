@@ -4,9 +4,7 @@ package alex.task_manager.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +12,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.logging.Handler;
 
 import alex.task_manager.R;
 import alex.task_manager.activities.CreateTaskActivity;
@@ -28,7 +22,7 @@ import alex.task_manager.utils.TimestampUtils;
 
 import static alex.task_manager.utils.TimestampUtils.timestampToString;
 
-public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView.ViewHolder>{
+public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCursorAdapter.TaskBaseViewHolder>{
 
     private int selectedItem = -1;
 
@@ -48,6 +42,7 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView
         int id;
         TasksRvCursorAdapter adapter;
         TextView deadlineTextView;
+        TextView authorTextView;
         boolean prevChecked;
 
         TaskBaseViewHolder(final View itemView, final TasksRvCursorAdapter adapter) {
@@ -58,6 +53,7 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView
             TaskTitle = itemView.findViewById(R.id.task_title);
             taskEditBtn = itemView.findViewById(R.id.task_edit_btn);
             deadlineTextView = itemView.findViewById(R.id.task_deadline);
+            authorTextView = itemView.findViewById(R.id.taskAuthor);
 
             taskEditBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -84,7 +80,7 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView
         public void bind(TaskViewModel task) {
 
             TaskTitle.setText(task.getName());
-            descriptionTextView.setText(task.getAbout());
+            deadlineTextView.setText(task.getAbout());
             authorTextView.setText(task.getAuthor());
             deadlineTextView.setText(timestampToString(task.getDeadline(),TimestampUtils.USER_FRIENDLY_DATE_FORMAT));
             TaskTitle.setChecked(task.isComplited());
@@ -124,7 +120,7 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView
             super.bind(task);
             descriptionTextView.setText(task.getAbout());
             authorTextView.setText(task.getAuthor());
-            deadlineTextView.setText(timestampToString(task.getTime(),TimestampUtils.USER_FRIENDLY_DATE_FORMAT));
+            deadlineTextView.setText(timestampToString(task.getDeadline(),TimestampUtils.USER_FRIENDLY_DATE_FORMAT));
         }
     }
 
@@ -155,8 +151,8 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        RecyclerView.ViewHolder holder;
+    public TaskBaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        TaskBaseViewHolder holder;
         View view;
 
         switch (viewType) {
@@ -176,12 +172,10 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView
     }
 
     @Override
-    public void onBindViewHolder(TaskViewHolder viewHolder, Cursor cursor) {
+    public void onBindViewHolder(TaskBaseViewHolder viewHolder, Cursor cursor) {
         TaskViewModel myListItem = (new TaskViewModel.Builder()).buildCurrentInstance(cursor);
         viewHolder.bind(myListItem);
-    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, Cursor cursor) {
         int viewType=viewHolder.getItemViewType();
-        TaskViewModel myListItem = taskViewModelMapper(cursor);
 
         switch (viewType) {
             case TYPE_MINIMAL:
@@ -199,7 +193,7 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<RecyclerView
     }
 
     void updateCursor() {
-        changeCursor(TasksDbService.getInstance(mContext).getTaskCursorByPerformerId(UserDbService.getInstance(mContext).getCurrentUserId()));
+        changeCursor(TasksDbService.getInstance(mContext).getTaskModelCursorByPerformerId(UserDbService.getInstance(mContext).getCurrentUserId()));
     }
 
     public void removeItem(int position) {
