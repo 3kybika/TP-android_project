@@ -127,6 +127,18 @@ public class TasksDbService {
     }
 
     public void updateTask(int id, TaskModel task) {
-        // TODO: implement
+        SQLiteDatabase db = dbManager.getWritableDatabase();
+
+        db.execSQL(String.format(
+                "UPDATE Tasks(name, about, complited, deadline) " +
+                "SET VALUES (\"%s\", \"%s\", %d, \"%s\")" +
+                "WHERE _id = %d",
+                task.getCaption(),
+                task.getAbout(),
+                task.isChecked() ? 1 : 0,
+                task.getStringTime(),
+                task.getId()
+            ));
+
     }
 }
