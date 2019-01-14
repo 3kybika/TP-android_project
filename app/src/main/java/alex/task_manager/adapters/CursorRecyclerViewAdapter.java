@@ -92,14 +92,18 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
                 }
                 mRowIdColumn = newCursor.getColumnIndexOrThrow("_id");
                 mDataValid = true;
-                notifyDataSetChanged();
+//                notifyDataSetChanged();
             } else {
                 mRowIdColumn = -1;
                 mDataValid = false;
-                notifyDataSetChanged();
+//                notifyDataSetChanged();
                 //There is no notifyDataSetInvalidated() method in RecyclerView.Adapter
             }
             return oldCursor;
+        }
+
+        void updateCursor() {
+            changeCursor(TasksDbService.getInstance(mContext).getTaskCursorByPerformerId(UserDbService.getInstance(mContext).getCurrentUserId()));
         }
 
         private class NotifyingDataSetObserver extends DataSetObserver {
@@ -107,7 +111,6 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
             public void onChanged() {
                 super.onChanged();
                 mDataValid = true;
-                changeCursor(TasksDbService.getInstance(mContext).getTaskCursorByPerformerId(UserDbService.getInstance(mContext).getCurrentUserId()));
                 notifyDataSetChanged();
             }
 
