@@ -103,12 +103,25 @@ public class TasksDbService {
         database.execSQL(updateQuery);
     }
 
+    public void setDeleted(int id) {
+        String updateQuery = String.format(
+                "UPDATE Tasks " +
+                        "SET deleted=%d " +
+                        "WHERE _id = %d",
+                1,
+                id
+        );
+        SQLiteDatabase database = dbManager.getWritableDatabase();
+        database.execSQL(updateQuery);
+    }
+
     public void updateTask(int id, TaskModel task) {
         SQLiteDatabase db = dbManager.getWritableDatabase();
 
         db.execSQL(String.format(
-                "UPDATE Tasks(name, about, complited, deadline, notification_time, last_update_time) " +
-                "SET VALUES (\"%s\", \"%s\", %d, \"%s\", \"%s\", \"%s\")" +
+                "UPDATE Tasks " +
+                "SET name = \"%s\", about = \"%s\", complited = %d, deadline =\"%s\", " +
+                        "notification_time =\"%s\", last_update_time = \"%s\" " +
                 "WHERE _id = %d",
                 task.getName(),
                 task.getAbout(),

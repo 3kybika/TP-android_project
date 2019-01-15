@@ -198,7 +198,7 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCurso
 
     public void removeItem(int position) {
         int id = (int)getItemId(position);
-        TasksDbService.getInstance(mContext).removeTask(id);
+        TasksDbService.getInstance(mContext).setDeleted(id);
 
         updateCursor();
         notifyItemRemoved(position);
