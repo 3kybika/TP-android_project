@@ -42,7 +42,6 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCurso
         int id;
         TasksRvCursorAdapter adapter;
         TextView deadlineTextView;
-        TextView authorTextView;
         boolean prevChecked;
 
         TaskBaseViewHolder(final View itemView, final TasksRvCursorAdapter adapter) {
@@ -53,7 +52,6 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCurso
             TaskTitle = itemView.findViewById(R.id.task_title);
             taskEditBtn = itemView.findViewById(R.id.task_edit_btn);
             deadlineTextView = itemView.findViewById(R.id.task_deadline);
-            authorTextView = itemView.findViewById(R.id.taskAuthor);
 
             taskEditBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -80,8 +78,6 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCurso
         public void bind(TaskViewModel task) {
 
             TaskTitle.setText(task.getName());
-            deadlineTextView.setText(task.getAbout());
-            //authorTextView.setText(task.getAuthor());
             deadlineTextView.setText(timestampToString(task.getDeadline(),TimestampUtils.USER_FRIENDLY_DATE_FORMAT));
             TaskTitle.setChecked(task.isComplited());
             id = task.getId();
@@ -99,14 +95,12 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCurso
     class TaskDetailedViewHolder extends TaskBaseViewHolder {
         TextView descriptionTextView;
         TextView authorTextView;
-        TextView deadlineTextView;
 
         TaskDetailedViewHolder(View itemView, final TasksRvCursorAdapter adapter) {
             super(itemView, adapter);
 
             descriptionTextView = itemView.findViewById(R.id.task_description);
             authorTextView = itemView.findViewById(R.id.taskAuthor);
-            deadlineTextView = itemView.findViewById(R.id.task_deadline);
 
             itemView.findViewById(R.id.clickable_layout).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -120,7 +114,6 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCurso
             super.bind(task);
             descriptionTextView.setText(task.getAbout());
             authorTextView.setText(task.getAuthor());
-            deadlineTextView.setText(timestampToString(task.getDeadline(),TimestampUtils.USER_FRIENDLY_DATE_FORMAT));
         }
     }
 
