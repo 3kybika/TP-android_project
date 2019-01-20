@@ -31,8 +31,8 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCurso
 
     private Context mContext;
 
-    public TasksRvCursorAdapter(Context context, Cursor cursor){
-        super(context,cursor);
+    public TasksRvCursorAdapter(Context context, Cursor cursor, String idColumnName){
+        super(context,cursor, idColumnName);
         mContext = context;
     }
 
@@ -59,7 +59,7 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCurso
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(v.getContext(), CreateTaskActivity.class);
-                    intent.putExtra("task_id", id);
+                    intent.putExtra(TasksDbService.LOCAL_ID_COLUMN, id);
                     v.getContext().startActivity(intent);
                 }
             });
@@ -81,7 +81,7 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCurso
 
             TaskTitle.setText(task.getName());
             deadlineTextView.setText(task.getAbout());
-            authorTextView.setText(task.getAuthor());
+            //authorTextView.setText(task.getAuthor());
             deadlineTextView.setText(timestampToString(task.getDeadline(),TimestampUtils.USER_FRIENDLY_DATE_FORMAT));
             TaskTitle.setChecked(task.isComplited());
             id = task.getId();
@@ -193,7 +193,10 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCurso
     }
 
     void updateCursor() {
-        changeCursor(TasksDbService.getInstance(mContext).getTaskModelCursorByPerformerId(UserDbService.getInstance(mContext).getCurrentUserId()));
+        changeCursor(
+                TasksDbService.getInstance(mContext).getTaskModelCursorByPerformerId(UserDbService.getInstance(mContext).getCurrentUserId()),
+                TasksDbService.LOCAL_ID_COLUMN
+        );
     }
 
     public void removeItem(int position) {

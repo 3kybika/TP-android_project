@@ -23,6 +23,7 @@ import alex.task_manager.adapters.TasksRvCursorAdapter;
 import alex.task_manager.services.DbServices.TasksDbService;
 import alex.task_manager.services.DbServices.UserDbService;
 import alex.task_manager.adapters.SwipeToDeleteCallback;
+import alex.task_manager.services.SyncService.SyncService;
 
 public class TasksActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -31,6 +32,7 @@ public class TasksActivity extends AppCompatActivity implements NavigationView.O
 
     private TasksDbService tasksDbService;
     private UserDbService usersDbService;
+    private SyncService syncService;
 
 
     @Override
@@ -59,6 +61,7 @@ public class TasksActivity extends AppCompatActivity implements NavigationView.O
 
         tasksDbService = TasksDbService.getInstance(this.getApplicationContext());
         usersDbService  = UserDbService.getInstance(this.getApplicationContext());
+        syncService = SyncService.getInstance(this.getApplicationContext());
 
     }
 
@@ -66,7 +69,12 @@ public class TasksActivity extends AppCompatActivity implements NavigationView.O
     public void onStart() {
         super.onStart();
         initRecyclerView();
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        processUpdatingData();
     }
 
     @Override
@@ -101,9 +109,11 @@ public class TasksActivity extends AppCompatActivity implements NavigationView.O
     private void initRecyclerView() {
         tasksAdapter = new TasksRvCursorAdapter(
                 this.getApplicationContext(),
-                tasksDbService.getTaskModelCursorByPerformerId(usersDbService.getCurrentUserId())
+                tasksDbService.getTaskModelCursorByPerformerId(usersDbService.getCurrentUserId()),
+                TasksDbService.LOCAL_ID_COLUMN
         );
-        updateList(tasksDbService.getTaskModelCursorByPerformerId(usersDbService.getCurrentUserId()));
+
+        processUpdatingData();
 
         tasksRecyclerView = findViewById(R.id.tasks_recycler_view);
         tasksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -116,7 +126,11 @@ public class TasksActivity extends AppCompatActivity implements NavigationView.O
     }
 
     public void updateList(Cursor cursor) {
-        tasksAdapter.changeCursor(cursor);
+        tasksAdapter.changeCursor(cursor, TasksDbService.LOCAL_ID_COLUMN);
+    }
+
+    public void processUpdatingData() {
+        updateList(tasksDbService.getTaskModelCursorByPerformerId(usersDbService.getCurrentUserId()));
     }
 
     public void goToCreationTaskPage() {

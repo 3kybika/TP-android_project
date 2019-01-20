@@ -20,7 +20,7 @@ public class TimestampUtils {
 
     public static Timestamp stringToTimestamp(String time) {
 
-        if (time == null || time.equals("0")){
+        if (time == null || time.equals("null")){
             return  null;
         }
         String str = ZonedDateTime.parse(time).format(DateTimeFormatter.ISO_INSTANT);

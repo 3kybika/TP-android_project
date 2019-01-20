@@ -4,6 +4,8 @@ import android.database.Cursor;
 
 import com.google.gson.annotations.SerializedName;
 
+import alex.task_manager.services.DbServices.UserDbService;
+
 public class UserModel {
     @SerializedName("id")
     private final int id;
@@ -16,9 +18,9 @@ public class UserModel {
 
         @Override
         protected UserModel mapper(Cursor cursor) {
-            int id = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
-            String email = cursor.getString(cursor.getColumnIndexOrThrow("email"));
-            String login = cursor.getString(cursor.getColumnIndexOrThrow("login"));
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow(UserDbService.LOGIN_COLUMN));
+            String email = cursor.getString(cursor.getColumnIndexOrThrow(UserDbService.EMAI_COLUMN));
+            String login = cursor.getString(cursor.getColumnIndexOrThrow(UserDbService.LOGIN_COLUMN));
 
             return new UserModel(id, login, email);
         }

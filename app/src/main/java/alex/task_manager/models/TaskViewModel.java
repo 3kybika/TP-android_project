@@ -1,9 +1,12 @@
 package alex.task_manager.models;
 
 import android.database.Cursor;
+import android.util.Log;
 
 import java.sql.Timestamp;
 
+import alex.task_manager.services.DbServices.TasksDbService;
+import alex.task_manager.services.DbServices.UserDbService;
 import alex.task_manager.utils.TimestampUtils;
 
 import static alex.task_manager.utils.TimestampUtils.timestampToString;
@@ -23,16 +26,17 @@ public class TaskViewModel {
 
         @Override
         protected TaskViewModel mapper(Cursor cursor) {
-            int id = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
-            String author = cursor.getString(cursor.getColumnIndexOrThrow("login"));
-            String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
-            String about = cursor.getString(cursor.getColumnIndexOrThrow("about"));
-            boolean complited = toBoolean(cursor.getInt(cursor.getColumnIndexOrThrow("completed")));
-            Timestamp deadline = TimestampUtils.stringToTimestamp(cursor.getString(cursor.getColumnIndex("deadline")));
 
-            int index = cursor.getColumnIndex("notificationTime");
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow(TasksDbService.LOCAL_ID_COLUMN));
+            String author = cursor.getString(cursor.getColumnIndexOrThrow(UserDbService.LOGIN_COLUMN));
+            String name = cursor.getString(cursor.getColumnIndexOrThrow(TasksDbService.TASK_NAME_COLUMN));
+            String about = cursor.getString(cursor.getColumnIndexOrThrow(TasksDbService.TASK_ABOUT_COLUMN));
+            boolean complited = toBoolean(cursor.getInt(cursor.getColumnIndexOrThrow(TasksDbService.COMPLITED_COLUMN)));
+            Timestamp deadline = TimestampUtils.stringToTimestamp(cursor.getString(cursor.getColumnIndex(TasksDbService.DEADLINE_COLUMN)));
+
+            int index = cursor.getColumnIndex(TasksDbService.NOTIFICATION_TIME_COLUMN);
             Timestamp notificationTime = index != -1 ? TimestampUtils.stringToTimestamp(cursor.getString(index)) : null;
-            index = cursor.getColumnIndex("lastChangeTime");
+            index = cursor.getColumnIndex(TasksDbService.LAST_UPDATE_TIME_COLUMN);
             Timestamp lastChangeTime = index != -1 ? TimestampUtils.stringToTimestamp(cursor.getString(index)) : null;
 
             return new TaskViewModel(id, author, name, about, complited, deadline, notificationTime, lastChangeTime);

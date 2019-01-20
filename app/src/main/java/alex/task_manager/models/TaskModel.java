@@ -1,13 +1,11 @@
 package alex.task_manager.models;
 
 import android.database.Cursor;
-import android.util.Log;
 
 import java.sql.Timestamp;
 
+import alex.task_manager.services.DbServices.TasksDbService;
 import alex.task_manager.utils.TimestampUtils;
-
-import static alex.task_manager.utils.TimestampUtils.timestampToString;
 
 public class TaskModel {
     private int _id;
@@ -22,16 +20,16 @@ public class TaskModel {
 
         @Override
         protected TaskModel mapper(Cursor cursor) {
-            int id = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
-            int authorId = cursor.getInt(cursor.getColumnIndexOrThrow("author_id"));
-            String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
-            String about = cursor.getString(cursor.getColumnIndexOrThrow("about"));
-            boolean complited = toBoolean(cursor.getInt(cursor.getColumnIndexOrThrow("completed")));
-            boolean deleted = toBoolean(cursor.getInt(cursor.getColumnIndexOrThrow("deleted")));
-            Timestamp deadline = TimestampUtils.stringToTimestamp(cursor.getString(cursor.getColumnIndexOrThrow("deadline")));
-            Timestamp notificationTime = TimestampUtils.stringToTimestamp(cursor.getString(cursor.getColumnIndexOrThrow("notification_time")));
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow(TasksDbService.GLOBAL_ID_COLUMN));
+            int authorId = cursor.getInt(cursor.getColumnIndexOrThrow(TasksDbService.AUTHOR_ID_COLUMN));
+            String name = cursor.getString(cursor.getColumnIndexOrThrow(TasksDbService.TASK_NAME_COLUMN));
+            String about = cursor.getString(cursor.getColumnIndexOrThrow(TasksDbService.TASK_ABOUT_COLUMN));
+            boolean complited = toBoolean(cursor.getInt(cursor.getColumnIndexOrThrow(TasksDbService.COMPLITED_COLUMN)));
+            boolean deleted = toBoolean(cursor.getInt(cursor.getColumnIndexOrThrow(TasksDbService.DELETED_COLUMN)));
+            Timestamp deadline = TimestampUtils.stringToTimestamp(cursor.getString(cursor.getColumnIndexOrThrow(TasksDbService.DEADLINE_COLUMN)));
+            Timestamp notificationTime = TimestampUtils.stringToTimestamp(cursor.getString(cursor.getColumnIndexOrThrow(TasksDbService.NOTIFICATION_TIME_COLUMN)));
 
-            Timestamp lastChangeTime = TimestampUtils.stringToTimestamp(cursor.getString(cursor.getColumnIndexOrThrow("last_update_time")));
+            Timestamp lastChangeTime = TimestampUtils.stringToTimestamp(cursor.getString(cursor.getColumnIndexOrThrow(TasksDbService.LAST_UPDATE_TIME_COLUMN)));
 
             return new TaskModel(id, authorId, name, about, complited, deleted, deadline, notificationTime, lastChangeTime);
         }

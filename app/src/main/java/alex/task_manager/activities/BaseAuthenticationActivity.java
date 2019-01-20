@@ -30,7 +30,7 @@ public abstract class BaseAuthenticationActivity extends AppCompatActivity {
         @Override
         public void onUserError(final Exception error){
             // catched the error: server is not available
-            if (cookieService.hasCookie(userNetworkService.BASE_URL)) {
+            if (cookieService.hasCookie(userNetworkService.BASE_URL) && (userDbService.getCurrentUser() != null)) {
                 //cookie exist - go in offline
                 showMsgAboutOfflineStage(error);
                 changeToMainActivity();

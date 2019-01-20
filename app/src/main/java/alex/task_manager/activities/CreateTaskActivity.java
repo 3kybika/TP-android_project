@@ -20,6 +20,7 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 
 import alex.task_manager.R;
+import alex.task_manager.models.TaskForm;
 import alex.task_manager.models.TaskModel;
 import alex.task_manager.services.DbServices.TasksDbService;
 import alex.task_manager.services.DbServices.UserDbService;
@@ -57,11 +58,10 @@ public class CreateTaskActivity  extends AppCompatActivity {
 
         // recieving data
         Intent intent = getIntent();
-        id = intent.getIntExtra("task_id", -1);
+        id = intent.getIntExtra(TasksDbService.LOCAL_ID_COLUMN, -1);
         if (id != -1) {
             editing = true;
-
-            TaskModel.Builder taskBuilder = new TaskModel.Builder();
+            TaskForm.Builder taskBuilder = new TaskForm.Builder();
             fillFieldsWithTask(
                     taskBuilder.buildOneInstance(tasksDbService.getTaskModelCursorById(id))
             );
@@ -73,7 +73,7 @@ public class CreateTaskActivity  extends AppCompatActivity {
         super.onStart();
     }
 
-    private void fillFieldsWithTask(TaskModel task) {
+    private void fillFieldsWithTask(TaskForm task) {
         taskTitleEditText.setText(task.getName());
         taskDescriptionEditText.setText(task.getAbout());
         if (task.getDeadline() != null) {
@@ -118,8 +118,8 @@ public class CreateTaskActivity  extends AppCompatActivity {
             }
         }
 
-        TaskModel task = new TaskModel(
-                userDbService.getCurrentUserId(),
+        TaskForm task = new TaskForm(
+                0,
                 title,
                 description,
                 deadline,

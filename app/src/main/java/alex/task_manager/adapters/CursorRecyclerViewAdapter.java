@@ -4,11 +4,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import alex.task_manager.services.DbServices.TasksDbService;
 import alex.task_manager.services.DbServices.UserDbService;
 
 public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
+
+        private String idColumnName;
 
         private Context mContext;
 
@@ -20,12 +23,11 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
 
         private DataSetObserver mDataSetObserver;
 
-        public CursorRecyclerViewAdapter(Context context, Cursor cursor) {
+        public CursorRecyclerViewAdapter(Context context, Cursor cursor, String idColumnName) {
             mContext = context;
             mCursor = cursor;
             mDataValid = cursor != null;
-            mRowIdColumn = mDataValid ? mCursor.getColumnIndex("_id") : -1;
-
+            mRowIdColumn = mDataValid ? mCursor.getColumnIndex(idColumnName) : -1;
             mDataSetObserver = new NotifyingDataSetObserver();
             if (mCursor != null) {
                 mCursor.registerDataSetObserver(mDataSetObserver);
@@ -70,14 +72,15 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
             onBindViewHolder(viewHolder, mCursor);
         }
 
-        public void changeCursor(Cursor cursor) {
+        public void changeCursor(Cursor cursor, String idColumnName ) {
+            this.idColumnName = idColumnName;
             Cursor old = swapCursor(cursor);
             if (old != null) {
                 old.close();
             }
         }
 
-        public Cursor swapCursor(Cursor newCursor) {
+        private Cursor swapCursor(Cursor newCursor) {
             if (newCursor == mCursor) {
                 return null;
             }
@@ -90,13 +93,13 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
                 if (mDataSetObserver != null) {
                     mCursor.registerDataSetObserver(mDataSetObserver);
                 }
-                mRowIdColumn = newCursor.getColumnIndexOrThrow("_id");
+                mRowIdColumn = mCursor.getColumnIndexOrThrow(idColumnName);
                 mDataValid = true;
-//                notifyDataSetChanged();
+                notifyDataSetChanged();
             } else {
                 mRowIdColumn = -1;
                 mDataValid = false;
-//                notifyDataSetChanged();
+                notifyDataSetChanged();
                 //There is no notifyDataSetInvalidated() method in RecyclerView.Adapter
             }
             return oldCursor;

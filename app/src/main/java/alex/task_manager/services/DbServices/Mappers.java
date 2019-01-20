@@ -3,6 +3,7 @@ package alex.task_manager.services.DbServices;
 import android.database.Cursor;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,4 +33,11 @@ public class Mappers {
         }
     }
 
+    public static final class TimestampMapper extends DbModelBuilder<Timestamp> {
+
+        @Override
+        protected Timestamp mapper(Cursor cursor) {
+            return TimestampUtils.stringToTimestamp(cursor.getString(0));
+        }
+    }
 }

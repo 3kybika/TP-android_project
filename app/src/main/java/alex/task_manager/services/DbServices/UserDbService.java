@@ -11,6 +11,17 @@ import alex.task_manager.models.UserModel;
 
 public class UserDbService {
 
+    public static final String
+            USER_TABLE_NAME = "Users",
+            USER_ID_COLUMN = "user_id",
+            LOGIN_COLUMN = "login",
+            EMAI_COLUMN = "email",
+
+            CURRENT_USER_TABLE_NAME = "LastUser",
+            CURRENT_USER_KEY_COLUMN = "_id",
+            CURRENT_USER_ID_COLUMN = "user_id";
+    public static final int CURRENT_USER_KEY= 0;
+
     Context context;
     DatabaseManager dbManager;
     private static final UserDbService mInstance = new UserDbService();
@@ -24,31 +35,41 @@ public class UserDbService {
     public static void createDatabase(SQLiteDatabase db) {
         Log.d("User Service", "onCreate database");
         // создаем таблицу с полями
-        db.execSQL("CREATE TABLE Users (" +
-                "_id INTEGER PRIMARY KEY," +
-                "login TEXT," +
-                "email TEXT" +
+
+        db.execSQL("CREATE TABLE "+ USER_TABLE_NAME +" (" +
+                USER_ID_COLUMN + " INTEGER PRIMARY KEY," +
+                LOGIN_COLUMN   + " TEXT," +
+                EMAI_COLUMN    + " TEXT" +
                 ");"
         );
-        db.execSQL("CREATE TABLE LastUser (" +
-                "_id INTEGER PRIMARY KEY," +
-                "user_id INTEGER" +
-                ")"
+        String query = "CREATE TABLE " + CURRENT_USER_TABLE_NAME + " (" +
+                CURRENT_USER_KEY_COLUMN + " INTEGER PRIMARY KEY," +
+                CURRENT_USER_ID_COLUMN + " INTEGER" +
+                ");";
+        db.execSQL(query
         );
-        db.execSQL("INSERT INTO LastUser(_id, user_id) VALUES(0, -1);");
+        Log.d("db", query);
+
+        db.execSQL("INSERT INTO " + CURRENT_USER_TABLE_NAME +
+                "("+ CURRENT_USER_KEY_COLUMN+","  +CURRENT_USER_ID_COLUMN + " ) " +
+                "VALUES(" + CURRENT_USER_KEY +", -1);");
     }
 
     public static void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion != newVersion) {
-            db.execSQL("DROP TABLE IF EXISTS Users;");
-            db.execSQL("DROP TABLE IF EXISTS LastUser;");
+            Log.d("UserDb", "Recreate");
+            db.execSQL("DROP TABLE IF EXISTS "+ USER_TABLE_NAME +";");
+            db.execSQL("DROP TABLE IF EXISTS " + CURRENT_USER_TABLE_NAME + ";");
             createDatabase(db);
         }
     }
     public void addUser(UserModel user) {
         SQLiteDatabase db = dbManager.getWritableDatabase();
         db.execSQL(String.format(
-                "REPLACE INTO Users (_id, login, email) " +
+                "REPLACE INTO " + USER_TABLE_NAME + " (" +
+                        USER_ID_COLUMN +"," +
+                        LOGIN_COLUMN + "," +
+                        EMAI_COLUMN +") " +
                         "VALUES(%d, \"%s\", \"%s\");",
                 user.getId(), user.getLogin(), user.getEmail()
         ));
@@ -57,14 +78,17 @@ public class UserDbService {
     public void setCurrentUser(UserModel user){
         SQLiteDatabase db = dbManager.getWritableDatabase();
 
-        db.execSQL(String.format("UPDATE LastUser SET user_id = %d WHERE _id=0;", user.getId()));
+        db.execSQL(String.format("UPDATE " + CURRENT_USER_TABLE_NAME +
+                " SET " +  CURRENT_USER_ID_COLUMN + " = %d " +
+                "WHERE " + CURRENT_USER_KEY_COLUMN + "=0;", user.getId()));
         addUser(user);
     }
 
     public Integer getCurrentUserId() {
         SQLiteDatabase db = dbManager.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("SELECT user_id FROM LastUser LIMIT 1;", null);
+        Cursor cursor = db.rawQuery("SELECT " + CURRENT_USER_ID_COLUMN +
+                " FROM " + CURRENT_USER_TABLE_NAME + " LIMIT 1;", null);
 
         return (new Mappers.IntegerMapper()).buildOneInstance(cursor);
     }
@@ -74,9 +98,9 @@ public class UserDbService {
         SQLiteDatabase db = dbManager.getReadableDatabase();
 
         Cursor cursor = db.rawQuery(
-                    "SELECT _id, login, email " +
-                    "FROM Users " +
-                    "WHERE Users._id = (SELECT user_id FROM LastUser LIMIT 1);",
+                    "SELECT * " +
+                    " FROM "+ USER_TABLE_NAME +
+                    " WHERE " + USER_ID_COLUMN + " = (SELECT " + CURRENT_USER_KEY_COLUMN + " FROM " + CURRENT_USER_TABLE_NAME + " LIMIT 1);",
                 null
                 );
         return (new UserModel.Builder()).buildOneInstance(cursor);

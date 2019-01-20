@@ -124,7 +124,7 @@ public class SignUpActivity extends BaseAuthenticationActivity implements View.O
     protected void showErrorAboutUncorrectValues(DefaultResponse responce) {
         Toast.makeText(
                 SignUpActivity.this,
-                getResources().getText(R.string.SignUpActivity__infoMsg__offlineMode),
+                getResources().getText(R.string.SignUpActivity__err__loginingErr),
                 Toast.LENGTH_LONG
         ).show();
     }
