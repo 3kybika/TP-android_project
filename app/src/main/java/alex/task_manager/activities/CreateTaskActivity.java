@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -21,7 +20,6 @@ import java.util.Calendar;
 
 import alex.task_manager.R;
 import alex.task_manager.models.TaskForm;
-import alex.task_manager.models.TaskModel;
 import alex.task_manager.services.DbServices.TasksDbService;
 import alex.task_manager.services.DbServices.UserDbService;
 import alex.task_manager.utils.TimestampUtils;
@@ -34,7 +32,8 @@ public class CreateTaskActivity  extends AppCompatActivity {
     private EditText taskTitleEditText, taskDescriptionEditText;
     private TextView calendarTextView, alarmTimeTextView;
 
-    Calendar calendar = Calendar.getInstance();
+    Calendar dateCalendar = Calendar.getInstance();
+    Calendar timeCalendar = Calendar.getInstance();
 
     private boolean editing = false;
     private int id;
@@ -55,6 +54,9 @@ public class CreateTaskActivity  extends AppCompatActivity {
 
         initCalendar();
         initButtonHandlers();
+
+        resetDeadlineTime();
+        resetAlarmTime();
 
         // recieving data
         Intent intent = getIntent();
@@ -77,8 +79,15 @@ public class CreateTaskActivity  extends AppCompatActivity {
         taskTitleEditText.setText(task.getName());
         taskDescriptionEditText.setText(task.getAbout());
         if (task.getDeadline() != null) {
-            calendar.setTime(task.getDeadline());
-            updateDateTextView();
+            dateCalendar.setTime(task.getDeadline());
+
+            updateDeadlineTextView();
+        }
+
+        if (task.getNotificationTime() != null) {
+            timeCalendar.setTime(task.getNotificationTime());
+
+            updetaAlarmTextView();
         }
     }
 
@@ -91,11 +100,11 @@ public class CreateTaskActivity  extends AppCompatActivity {
             taskTitleEditText.requestFocus();
             return;
         }
-        if ((calendar.isSet(Calendar.HOUR_OF_DAY)
-                && calendar.isSet(Calendar.MINUTE))
-                && !(calendar.isSet(Calendar.YEAR)
-                && calendar.isSet(Calendar.MONTH)
-                && calendar.isSet(Calendar.DAY_OF_MONTH))
+        if ((timeCalendar.get(Calendar.HOUR_OF_DAY) != 12
+                || timeCalendar.get(Calendar.MINUTE) != 0)
+                && !(dateCalendar.isSet(Calendar.YEAR)
+                && dateCalendar.isSet(Calendar.MONTH)
+                && dateCalendar.isSet(Calendar.DAY_OF_MONTH))
          ) {
             //ToDo: check this
             calendarTextView.setError(getString(R.string.CreatingTaskActivity__err__timeWithoutDate));
@@ -105,16 +114,14 @@ public class CreateTaskActivity  extends AppCompatActivity {
         Timestamp notificationTime = null;
         Timestamp deadline = null;
 
-        if (calendar.isSet(Calendar.YEAR)
-                && calendar.isSet(Calendar.MONTH)
-                && calendar.isSet(Calendar.DAY_OF_MONTH)
+        if (dateCalendar.isSet(Calendar.YEAR)
+                && dateCalendar.isSet(Calendar.MONTH)
+                && dateCalendar.isSet(Calendar.DAY_OF_MONTH)
         ) {
-            calendar.set(Calendar.HOUR_OF_DAY,0);
-            calendar.set(Calendar.MINUTE,0);
-            deadline = new Timestamp(calendar.getTime().getTime());
+            deadline = new Timestamp(dateCalendar.getTime().getTime());
 
-            if (calendar.isSet(Calendar.HOUR_OF_DAY) && calendar.isSet(Calendar.MINUTE)) {
-                notificationTime = new Timestamp(calendar.getTime().getTime());
+            if (timeCalendar.isSet(Calendar.HOUR_OF_DAY) && timeCalendar.isSet(Calendar.MINUTE)) {
+                notificationTime = new Timestamp(timeCalendar.getTime().getTime());
             }
         }
 
@@ -153,39 +160,26 @@ public class CreateTaskActivity  extends AppCompatActivity {
     }
 
     private void startTimeAlarmDialog() {
-        if (calendar.isSet(Calendar.HOUR_OF_DAY)
-                && calendar.isSet(Calendar.MINUTE)
-                ) {
-            new TimePickerDialog(
-                    CreateTaskActivity.this,
-                    timeDialogListener,
-                    calendar.get(Calendar.HOUR_OF_DAY),
-                    calendar.get(Calendar.MINUTE),
-                    true
+        new TimePickerDialog(
+                CreateTaskActivity.this,
+                timeDialogListener,
+                timeCalendar.get(Calendar.HOUR_OF_DAY),
+                timeCalendar.get(Calendar.MINUTE),
+                true
             ).show();
-        } else {
-            Calendar tmpCalendar = Calendar.getInstance();
-            new TimePickerDialog(
-                    CreateTaskActivity.this,
-                    timeDialogListener,
-                    tmpCalendar.get(Calendar.HOUR_OF_DAY),
-                    tmpCalendar.get(Calendar.MINUTE),
-                    true
-            ).show();
-        }
     }
 
     private void startCalendarDialog() {
-        if (calendar.isSet(Calendar.YEAR)
-                && calendar.isSet(Calendar.MONTH)
-                && calendar.isSet(Calendar.DAY_OF_MONTH)
+        if (dateCalendar.isSet(Calendar.YEAR)
+                && dateCalendar.isSet(Calendar.MONTH)
+                && dateCalendar.isSet(Calendar.DAY_OF_MONTH)
         ) {
             new DatePickerDialog(
                     CreateTaskActivity.this,
                     calendarDialogListener,
-                    calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH),
-                    calendar.get(Calendar.DAY_OF_MONTH)
+                    dateCalendar.get(Calendar.YEAR),
+                    dateCalendar.get(Calendar.MONTH),
+                    dateCalendar.get(Calendar.DAY_OF_MONTH)
             ).show();
         } else {
             Calendar tmpCalendar = Calendar.getInstance();
@@ -201,39 +195,43 @@ public class CreateTaskActivity  extends AppCompatActivity {
 
     TimePickerDialog.OnTimeSetListener timeDialogListener = new TimePickerDialog.OnTimeSetListener() {
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-            calendar.set(Calendar.MINUTE, minute);
-            setTime();
+            timeCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            timeCalendar.set(Calendar.MINUTE, minute);
+            updetaAlarmTextView();
         }
     };
 
     DatePickerDialog.OnDateSetListener calendarDialogListener = new DatePickerDialog.OnDateSetListener() {
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-            calendar.set(Calendar.YEAR, year);
-            calendar.set(Calendar.MONTH, monthOfYear);
-            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-            updateDateTextView();
+            dateCalendar.set(Calendar.YEAR, year);
+            dateCalendar.set(Calendar.MONTH, monthOfYear);
+            dateCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            updateDeadlineTextView();
         }
     };
 
-    private void setTime() {
-        if (calendar.isSet(Calendar.HOUR_OF_DAY) && calendar.isSet(Calendar.MINUTE)) {
+    private void updetaAlarmTextView() {
+        if (!(dateCalendar.isSet(Calendar.YEAR)
+              && dateCalendar.isSet(Calendar.MONTH)
+              && dateCalendar.isSet(Calendar.DAY_OF_MONTH))
+            && timeCalendar.get(Calendar.HOUR_OF_DAY) == 12
+            && timeCalendar.get(Calendar.MINUTE) == 0) {
+            alarmTimeTextView.setText("");
+        } else {
             alarmTimeTextView.setText(TimestampUtils.calendarToString(
-                    calendar,
+                    timeCalendar,
                     TimestampUtils.USER_FRIENDLY_TIME_FORMAT
             ));
-        } else {
-            alarmTimeTextView.setText("");
         }
     }
 
-    private void  updateDateTextView() {
-        if (calendar.isSet(Calendar.YEAR)
-                && calendar.isSet(Calendar.MONTH)
-                && calendar.isSet(Calendar.DAY_OF_MONTH)
+    private void updateDeadlineTextView() {
+        if (dateCalendar.isSet(Calendar.YEAR)
+                && dateCalendar.isSet(Calendar.MONTH)
+                && dateCalendar.isSet(Calendar.DAY_OF_MONTH)
         ) {
             calendarTextView.setText(TimestampUtils.calendarToString(
-                    calendar,
+                    dateCalendar,
                     TimestampUtils.USER_FRIENDLY_DATE_FORMAT
             ));
         } else {
@@ -242,7 +240,7 @@ public class CreateTaskActivity  extends AppCompatActivity {
     }
 
     private void initCalendar() {
-        calendar.clear();
+        dateCalendar.clear();
     }
 
     private void initButtonHandlers() {
@@ -259,7 +257,7 @@ public class CreateTaskActivity  extends AppCompatActivity {
         resetTimeAlarmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                resetDateTime();
+                resetAlarmTime();
             }
         });
 
@@ -267,7 +265,7 @@ public class CreateTaskActivity  extends AppCompatActivity {
         resetTimeDeadlineBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                resetTimeAlarm();
+                resetDeadlineTime();
             }
         });
 
@@ -275,17 +273,9 @@ public class CreateTaskActivity  extends AppCompatActivity {
         todayBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Calendar tmpCalendar = Calendar.getInstance();
+                setToday();
 
-                int date = tmpCalendar.get(Calendar.DAY_OF_MONTH);
-                int month = tmpCalendar.get(Calendar.MONTH);
-                int year = tmpCalendar.get(Calendar.YEAR);
-
-                calendar.set(Calendar.YEAR, date);
-                calendar.set(Calendar.MONTH, month);
-                calendar.set(Calendar.DAY_OF_MONTH, year);
-
-                updateDateTextView();
+                updateDeadlineTextView();
             }
         });
 
@@ -293,18 +283,11 @@ public class CreateTaskActivity  extends AppCompatActivity {
         tomorrowBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Calendar tmpCalendar = Calendar.getInstance();
-                tmpCalendar.add(Calendar.DAY_OF_YEAR, 1);
+                setToday();
 
-                int date = tmpCalendar.get(Calendar.DAY_OF_MONTH);
-                int month = tmpCalendar.get(Calendar.MONTH);
-                int year = tmpCalendar.get(Calendar.YEAR);
+                dateCalendar.add(Calendar.DAY_OF_YEAR, 1);
 
-                calendar.set(Calendar.YEAR, date);
-                calendar.set(Calendar.MONTH, month);
-                calendar.set(Calendar.DAY_OF_MONTH, year);
-
-                updateDateTextView();
+                updateDeadlineTextView();
             }
         });
 
@@ -312,18 +295,11 @@ public class CreateTaskActivity  extends AppCompatActivity {
         nextWeekBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Calendar tmpCalendar = Calendar.getInstance();
-                tmpCalendar.add(Calendar.DAY_OF_YEAR, 7);
+                setToday();
 
-                int date = tmpCalendar.get(Calendar.DAY_OF_MONTH);
-                int month = tmpCalendar.get(Calendar.MONTH);
-                int year = tmpCalendar.get(Calendar.YEAR);
+                dateCalendar.add(Calendar.DAY_OF_YEAR, 7);
 
-                calendar.set(Calendar.YEAR, date);
-                calendar.set(Calendar.MONTH, month);
-                calendar.set(Calendar.DAY_OF_MONTH, year);
-
-                updateDateTextView();
+                updateDeadlineTextView();
             }
         });
 
@@ -344,18 +320,23 @@ public class CreateTaskActivity  extends AppCompatActivity {
         });
     }
 
-    private void resetTimeAlarm() {
-        calendar.set(Calendar.HOUR, -1);
-        calendar.set(Calendar.MINUTE, -1);
+    private void resetAlarmTime() {
+        timeCalendar.set(Calendar.HOUR_OF_DAY, 12);
+        timeCalendar.set(Calendar.MINUTE, 0);
 
-        calendarTextView.setText("");
+        updetaAlarmTextView();
     }
 
-    private void resetDateTime() {
-        calendar.set(Calendar.YEAR, -1);
-        calendar.set(Calendar.MONTH, -1);
-        calendar.set(Calendar.DAY_OF_MONTH, -1);
+    private void resetDeadlineTime() {
+        dateCalendar.clear(Calendar.YEAR);
+        dateCalendar.clear(Calendar.MONTH);
+        dateCalendar.clear(Calendar.DAY_OF_MONTH);
 
-        alarmTimeTextView.setText("");
+        updateDeadlineTextView();
+        updetaAlarmTextView();
+    }
+
+    private void setToday() {
+        dateCalendar = Calendar.getInstance();
     }
 }
