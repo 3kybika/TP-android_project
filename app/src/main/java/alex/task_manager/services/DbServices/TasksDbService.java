@@ -121,7 +121,7 @@ public class TasksDbService {
                 "SELECT * " +
                         "FROM Tasks AS T " +
                         "INNER JOIN Users ON Users.user_id = T.author_id " +
-                        "WHERE T.author_id = %d;",
+                        "WHERE T.author_id = %d AND " + DELETED_COLUMN +"= 0;",
                 performerId
         );
         SQLiteDatabase database = dbManager.getReadableDatabase();

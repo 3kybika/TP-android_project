@@ -15,25 +15,25 @@ public class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
     private TasksRvCursorAdapter mAdapter;
     private final ColorDrawable background;
 
-//    @Override
-//    public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-//        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-//        View itemView = viewHolder.itemView;
-//        int backgroundCornerOffset = 20;
-//
-//        if (dX > 0) { // Swiping to the right
-//            background.setBounds(itemView.getLeft(), itemView.getTop(),
-//                    itemView.getLeft() + ((int) dX) + backgroundCornerOffset,
-//                    itemView.getBottom());
-//
-//        } else if (dX < 0) { // Swiping to the left
-//            background.setBounds(itemView.getRight() + ((int) dX) - backgroundCornerOffset,
-//                    itemView.getTop(), itemView.getRight(), itemView.getBottom());
-//        } else { // view is unSwiped
-//            background.setBounds(0, 0, 0, 0);
-//        }
-//        background.draw(c);
-//    }
+    @Override
+    public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+        View itemView = viewHolder.itemView;
+        int backgroundCornerOffset = 20;
+
+        if (dX > 0) { // Swiping to the right
+            background.setBounds(itemView.getLeft(), itemView.getTop(),
+                    itemView.getLeft() + ((int) dX) + backgroundCornerOffset,
+                    itemView.getBottom());
+
+        } else if (dX < 0) { // Swiping to the left
+            background.setBounds(itemView.getRight() + ((int) dX) - backgroundCornerOffset,
+                    itemView.getTop(), itemView.getRight(), itemView.getBottom());
+        } else { // view is unSwiped
+            background.setBounds(0, 0, 0, 0);
+        }
+        background.draw(c);
+    }
 
     public SwipeToDeleteCallback(TasksRvCursorAdapter adapter) {
         super(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);

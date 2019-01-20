@@ -95,11 +95,11 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
                 }
                 mRowIdColumn = mCursor.getColumnIndexOrThrow(idColumnName);
                 mDataValid = true;
-                notifyDataSetChanged();
+//                notifyDataSetChanged();
             } else {
                 mRowIdColumn = -1;
                 mDataValid = false;
-                notifyDataSetChanged();
+//                notifyDataSetChanged();
                 //There is no notifyDataSetInvalidated() method in RecyclerView.Adapter
             }
             return oldCursor;
