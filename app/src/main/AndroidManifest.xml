@@ -34,6 +34,15 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:noHistory="true">
         </activity>
+        <receiver
+            android:name=".broadcast.NotificationBroadcastReciever"
+            android:enabled="true"
+            android:exported="false" >
+        </receiver>
+        <service
+            android:name=".services.IntentServices.NotificationIntentService"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>
