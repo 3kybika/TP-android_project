@@ -9,6 +9,7 @@ import android.util.Log;
 import java.sql.Timestamp;
 import java.util.List;
 
+import alex.task_manager.models.DbModelBuilder;
 import alex.task_manager.models.TaskForm;
 import alex.task_manager.models.TaskModel;
 import alex.task_manager.requests.TaskJsonModel;
@@ -71,29 +72,37 @@ public class TasksDbService {
     }
 
     public void createTask(TaskForm task) {
-        String insertQuery = String.format(
-                "INSERT INTO " + TASKS_TABLE_NAME + " (" +
-                        AUTHOR_ID_COLUMN + "," +
-                        CHANGED_BY_COLUMN + "," +
-                        PRIORITY_COLUMN + "," +
-                        TASK_NAME_COLUMN + "," +
-                        TASK_ABOUT_COLUMN   + "," +
-                        DEADLINE_COLUMN + "," +
-                        NOTIFICATION_TIME_COLUMN + "," +
-                        LAST_UPDATE_TIME_COLUMN +
-                        ") SELECT user_id, user_id, %d, \"%s\", \"%s\", \"%s\", \"%s\", \"%s\" " +
-                        "FROM " + UserDbService.CURRENT_USER_TABLE_NAME +
-                        " WHERE _id = 0;",
-                task.getPriority(),
-                task.getName(),
-                task.getAbout(),
-                task.getStringDeadline(),
-                task.getStringNotificationTime(),
-                TimestampUtils.getNowString(TimestampUtils.FULL_DATE_FORMAT)
-        );
+        int userId;
+        try (SQLiteDatabase database = dbManager.getReadableDatabase()) {
+            String[] columns = {UserDbService.CURRENT_USER_ID_COLUMN};
+            try (Cursor cursor = database.query(UserDbService.CURRENT_USER_TABLE_NAME, columns, "_id=0", null, null, null, null)) {
+                cursor.moveToFirst();
+                userId = cursor.getInt(0);
+            }
+        }
 
-        SQLiteDatabase database = dbManager.getWritableDatabase();
-        database.execSQL(insertQuery);
+        long taskId;
+
+        try (SQLiteDatabase database = dbManager.getWritableDatabase()) {
+            ContentValues cv = new ContentValues();
+            cv.put(AUTHOR_ID_COLUMN, userId);
+            cv.put(CHANGED_BY_COLUMN, userId);
+            cv.put(PRIORITY_COLUMN, task.getPriority());
+            cv.put(TASK_NAME_COLUMN, task.getName());
+            cv.put(DEADLINE_COLUMN, task.getStringDeadline());
+            cv.put(NOTIFICATION_TIME_COLUMN, task.getStringNotificationTime());
+            cv.put(LAST_UPDATE_TIME_COLUMN, TimestampUtils.getNowString(TimestampUtils.FULL_DATE_FORMAT));
+
+            taskId = database.insert(TASKS_TABLE_NAME, null, cv);
+        }
+
+        try (SQLiteDatabase database = dbManager.getReadableDatabase()) {
+            try (Cursor cursorTask = getTaskModelCursorById((int)taskId)) {
+                cursorTask.moveToFirst();
+                TaskModel model = new TaskModel.Builder().buildCurrentInstance(cursorTask);
+                NotificationDbService.getInstance(context).updateTaskNotification(model);
+            }
+        }
     }
 
     public void createTask(TaskModel task) {
@@ -111,6 +120,10 @@ public class TasksDbService {
         long rowID = database.insert("Tasks", null, contentValues);
         Log.d("TaskDbManager", String.format("Created task with id %d",rowID));
         database.close();
+
+        database = dbManager.getReadableDatabase();
+
+        NotificationDbService.getInstance(context).updateTaskNotification(task);
     }
 
 

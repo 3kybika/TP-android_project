@@ -39,12 +39,14 @@ public class DatabaseManager {
         CookieService.createDatabase(db);
         TasksDbService.createDatabase(db);
         UserDbService.createDatabase(db);
+        NotificationDbService.createTable(db);
     }
 
     private static void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         CookieService.upgrade(db, oldVersion, newVersion);
         TasksDbService.upgrade(db, oldVersion, newVersion);
         UserDbService.upgrade(db, oldVersion, newVersion);
+        NotificationDbService.upgrade(db, oldVersion, newVersion);
     }
 
     public SQLiteDatabase getWritableDatabase() {
