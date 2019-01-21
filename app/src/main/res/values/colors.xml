@@ -8,4 +8,5 @@
     <color name="textLightColour">#837a7a</color>
     <color name="mainTextColour">#000000</color>
     <color name="colorSuccess">#00ff7f</color>
+    <color name="white">#ffffff</color>
 </resources>
