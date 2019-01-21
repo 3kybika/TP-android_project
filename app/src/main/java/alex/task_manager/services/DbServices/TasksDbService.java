@@ -89,6 +89,7 @@ public class TasksDbService {
             cv.put(CHANGED_BY_COLUMN, userId);
             cv.put(PRIORITY_COLUMN, task.getPriority());
             cv.put(TASK_NAME_COLUMN, task.getName());
+            cv.put(TASK_ABOUT_COLUMN, task.getAbout());
             cv.put(DEADLINE_COLUMN, task.getStringDeadline());
             cv.put(NOTIFICATION_TIME_COLUMN, task.getStringNotificationTime());
             cv.put(LAST_UPDATE_TIME_COLUMN, TimestampUtils.getNowString(TimestampUtils.FULL_DATE_FORMAT));
