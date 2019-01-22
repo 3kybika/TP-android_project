@@ -20,6 +20,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import alex.task_manager.R;
@@ -202,14 +203,16 @@ public class TasksActivity extends AppCompatActivity implements NavigationView.O
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            // Handle the camera action
+            Cursor cursor = tasksDbService.getComlitedTaskModelCursorByPerformerId(
+                    usersDbService.getCurrentUserId()
+            );
+            tasksAdapter.changeCursor(cursor, TasksDbService.LOCAL_ID_COLUMN);
         } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_sync) {
+            Cursor cursor = tasksDbService.getWithoutDeadlinesTaskModelCursorByPerformerId(
+                    usersDbService.getCurrentUserId()
+            );
+            tasksAdapter.changeCursor(cursor, TasksDbService.LOCAL_ID_COLUMN);
+        }  else if (id == R.id.nav_sync) {
             synchronize();
         } else if (id == R.id.nav_profile) {
 

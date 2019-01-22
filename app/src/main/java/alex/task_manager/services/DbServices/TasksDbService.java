@@ -124,16 +124,47 @@ public class TasksDbService {
 
         String selectQuery = String.format(
                 "SELECT * " +
-                        " FROM Tasks AS T " +
-                        " INNER JOIN Users ON Users.user_id = T.author_id " +
-                        " WHERE T.author_id = %d AND " + DELETED_COLUMN +"= 0 " +
-                        " ORDER BY " + COMPLITED_COLUMN + ", " + DEADLINE_COLUMN +
-                        ";",
+                        "FROM Tasks AS T " +
+                        "INNER JOIN Users ON Users.user_id = T.author_id " +
+                        "WHERE T." + AUTHOR_ID_COLUMN +" = %d AND " + DELETED_COLUMN +"= 0;",
                 performerId
         );
         SQLiteDatabase database = dbManager.getReadableDatabase();
         return database.rawQuery(selectQuery, null);
     }
+
+    public Cursor getComlitedTaskModelCursorByPerformerId(int performerId) {
+
+        String selectQuery = String.format(
+                "SELECT * " +
+                        "FROM Tasks AS T " +
+                        "INNER JOIN Users ON Users.user_id = T.author_id " +
+                        "WHERE " +
+                        "T." + AUTHOR_ID_COLUMN +" = %d AND " +
+                        DELETED_COLUMN +" = 0 AND " +
+                        COMPLITED_COLUMN + " = 1;",
+                performerId
+        );
+        SQLiteDatabase database = dbManager.getReadableDatabase();
+        return database.rawQuery(selectQuery, null);
+    }
+
+    public Cursor getWithoutDeadlinesTaskModelCursorByPerformerId(int performerId) {
+        String selectQuery = String.format(
+                "SELECT * " +
+                        "FROM Tasks AS T " +
+                        "INNER JOIN Users ON Users.user_id = T.author_id " +
+                        "WHERE " +
+                        "T." + AUTHOR_ID_COLUMN +" = %d AND " +
+                        DELETED_COLUMN +" = 0 AND " +
+                        COMPLITED_COLUMN + " = 0 " +
+                        DEADLINE_COLUMN + " =  null;",
+                performerId
+        );
+        SQLiteDatabase database = dbManager.getReadableDatabase();
+        return database.rawQuery(selectQuery, null);
+    }
+
 
     public Cursor getTaskModelCursorById(int taskId) {
         Log.d("taskId", "" + taskId);
