@@ -124,9 +124,11 @@ public class TasksDbService {
 
         String selectQuery = String.format(
                 "SELECT * " +
-                        "FROM Tasks AS T " +
-                        "INNER JOIN Users ON Users.user_id = T.author_id " +
-                        "WHERE T.author_id = %d AND " + DELETED_COLUMN +"= 0;",
+                        " FROM Tasks AS T " +
+                        " INNER JOIN Users ON Users.user_id = T.author_id " +
+                        " WHERE T.author_id = %d AND " + DELETED_COLUMN +"= 0 " +
+                        " ORDER BY " + COMPLITED_COLUMN + ", " + DEADLINE_COLUMN +
+                        ";",
                 performerId
         );
         SQLiteDatabase database = dbManager.getReadableDatabase();
