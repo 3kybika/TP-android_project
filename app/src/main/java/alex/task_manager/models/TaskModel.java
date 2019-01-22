@@ -2,13 +2,16 @@ package alex.task_manager.models;
 
 import android.database.Cursor;
 
+import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.Calendar;
 
 import alex.task_manager.services.DbServices.TasksDbService;
 import alex.task_manager.utils.TimestampUtils;
 
 public class TaskModel {
     private int _id;
+    private int local_id;
     private int author_id;
     private String name;
     private String about;
@@ -21,6 +24,7 @@ public class TaskModel {
         @Override
         protected TaskModel mapper(Cursor cursor) {
             int id = cursor.getInt(cursor.getColumnIndexOrThrow(TasksDbService.GLOBAL_ID_COLUMN));
+            int local_id = cursor.getInt(cursor.getColumnIndexOrThrow(TasksDbService.LOCAL_ID_COLUMN));
             int authorId = cursor.getInt(cursor.getColumnIndexOrThrow(TasksDbService.AUTHOR_ID_COLUMN));
             String name = cursor.getString(cursor.getColumnIndexOrThrow(TasksDbService.TASK_NAME_COLUMN));
             String about = cursor.getString(cursor.getColumnIndexOrThrow(TasksDbService.TASK_ABOUT_COLUMN));
@@ -31,12 +35,13 @@ public class TaskModel {
 
             Timestamp lastChangeTime = TimestampUtils.stringToTimestamp(cursor.getString(cursor.getColumnIndexOrThrow(TasksDbService.LAST_UPDATE_TIME_COLUMN)));
 
-            return new TaskModel(id, authorId, name, about, complited, deleted, deadline, notificationTime, lastChangeTime);
+            return new TaskModel(id, local_id, authorId, name, about, complited, deleted, deadline, notificationTime, lastChangeTime);
         }
     }
 
     public TaskModel(
             int id,
+            int local_id,
             int author_id,
             String caption,
             String about,
@@ -47,6 +52,7 @@ public class TaskModel {
             Timestamp lastChangeTime
     ) {
         this._id = id;
+        this.local_id = local_id;
         this.author_id = author_id;
         this.name = caption;
         this.about = about;
@@ -119,6 +125,22 @@ public class TaskModel {
         return deadline;
     }
 
+    public long getFullTime() {
+        if (deadline != null) {
+            Calendar calendarFull = Calendar.getInstance();
+            Calendar calendarTime = Calendar.getInstance();
+
+            calendarFull.setTime(deadline);
+            calendarTime.setTime(notificationTime);
+
+            calendarFull.set(Calendar.HOUR_OF_DAY, calendarTime.get(Calendar.HOUR_OF_DAY));
+            calendarFull.set(Calendar.MINUTE, calendarTime.get(Calendar.MINUTE));
+
+            return calendarFull.getTimeInMillis();
+        }
+        return 0;
+    }
+
     public String getStringDeadline() {
         return TimestampUtils.timestampToString(deadline, TimestampUtils.FULL_DATE_FORMAT);
     }
@@ -145,5 +167,13 @@ public class TaskModel {
 
     public Timestamp getLastChangeTime() {
         return lastChangeTime;
+    }
+
+    public int getLocalId() {
+        return local_id;
+    }
+
+    public void setLocalId(int local_id) {
+        this.local_id = local_id;
     }
 }
