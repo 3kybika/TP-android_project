@@ -39,7 +39,6 @@ public class DatabaseManager {
         CookieService.createDatabase(db);
         TasksDbService.createDatabase(db);
         UserDbService.createDatabase(db);
-        NotificationDbService.createTable(db);
         SyncDbService.createDatabase(db);
     }
 
@@ -47,7 +46,6 @@ public class DatabaseManager {
         CookieService.upgrade(db, oldVersion, newVersion);
         TasksDbService.upgrade(db, oldVersion, newVersion);
         UserDbService.upgrade(db, oldVersion, newVersion);
-        NotificationDbService.upgrade(db, oldVersion, newVersion);
         SyncDbService.upgrade(db, oldVersion, newVersion);
     }
 

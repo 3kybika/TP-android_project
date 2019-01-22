@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import alex.task_manager.R;
 import alex.task_manager.activities.CreateTaskActivity;
+import alex.task_manager.models.TaskModel;
 import alex.task_manager.models.TaskViewModel;
 import alex.task_manager.services.DbServices.TasksDbService;
 import alex.task_manager.services.DbServices.UserDbService;
@@ -43,6 +44,7 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCurso
         TasksRvCursorAdapter adapter;
         TextView deadlineTextView;
         boolean prevChecked;
+        boolean binding;
 
         TaskBaseViewHolder(final View itemView, final TasksRvCursorAdapter adapter) {
             super(itemView);
@@ -65,22 +67,32 @@ public class TasksRvCursorAdapter extends CursorRecyclerViewAdapter<TasksRvCurso
             TaskTitle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (prevChecked != isChecked) {
-                        prevChecked = isChecked;
+                    if (!binding) {
                         TasksDbService.getInstance(buttonView.getContext()).setCompleted(id, isChecked);
 
                         adapter.updateCursor();
+
+                        notifyItemRemoved(TaskBaseViewHolder.this.getAdapterPosition());
+
+                        if (isChecked) {
+                            notifyItemRangeChanged(TaskBaseViewHolder.this.getAdapterPosition(), getItemCount());
+                        } else {
+                            notifyItemRangeChanged(0, getItemCount());
+                        }
                     }
                 }
             });
         }
 
         public void bind(TaskViewModel task) {
+            binding = true;
 
             TaskTitle.setText(task.getName());
             deadlineTextView.setText(timestampToString(task.getDeadline(),TimestampUtils.USER_FRIENDLY_DATE_FORMAT));
             TaskTitle.setChecked(task.isComplited());
             id = task.getId();
+
+            binding = false;
         }
 
         TasksRvCursorAdapter getAdapter() {
