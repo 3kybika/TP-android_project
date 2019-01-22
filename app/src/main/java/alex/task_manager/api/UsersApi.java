@@ -25,6 +25,9 @@ public interface UsersApi {
     Call<ResponseBody> updateUser(
             @Body ChangeUserDataForm updateForm
     );
+    @POST("logout/")
+    Call<ResponseBody> logOut();
+
 
     @GET("me/")
     Call<ResponseBody> getUser();

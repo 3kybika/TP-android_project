@@ -37,19 +37,21 @@ public class TasksDbService {
     Context context;
     DatabaseManager dbManager;
     private static TasksDbService mInstance = new TasksDbService();
+    private UserDbService userDbService;
 
     public static TasksDbService getInstance(Context context) {
         mInstance.context = context;
         mInstance.dbManager = DatabaseManager.getInstance(context);
+        mInstance.userDbService = UserDbService.getInstance(context);
         return mInstance;
     }
 
-    public static void  createDatabase(SQLiteDatabase db) {
+    public static void createDatabase(SQLiteDatabase db) {
         Log.d("Tasks Service", "onCreate database");
         // создаем таблицу с полями
         db.execSQL("CREATE TABLE "+ TASKS_TABLE_NAME +" (" +
                 LOCAL_ID_COLUMN         + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                GLOBAL_ID_COLUMN + " INTEGER DEFAULT NULL, " +
+                GLOBAL_ID_COLUMN        + " INTEGER DEFAULT -1, " +
                 AUTHOR_ID_COLUMN        + " INTEGER NOT NULL, " +
                 CHANGED_BY_COLUMN       + " INTEGER NOT NULL, " +
                 PRIORITY_COLUMN         + " INTEGER DEFAULT NULL, " +
@@ -126,8 +128,6 @@ public class TasksDbService {
 
         NotificationDbService.getInstance(context).updateTaskNotification(task);
     }
-
-
 
     public Cursor getTaskModelCursorByPerformerId(int performerId) {
 
@@ -233,17 +233,23 @@ public class TasksDbService {
     }
 
     public List<TaskJsonModel> getTasksForSync(Timestamp lastSyncTime) {
-
-        String query = String.format(
-                "SELECT * FROM " + TASKS_TABLE_NAME +
-                        " WHERE " + LAST_UPDATE_TIME_COLUMN + " > %s AND " +
-                        CHANGED_BY_COLUMN + " IN (" +
-                        "SELECT " + UserDbService.CURRENT_USER_ID_COLUMN +
-                        " FROM " + UserDbService.CURRENT_USER_TABLE_NAME +
-                        " WHERE " + UserDbService.CURRENT_USER_KEY_COLUMN + " = " + UserDbService.CURRENT_USER_KEY +
-                        ");",
-                lastSyncTime
-        );
+        String query;
+        int id = userDbService.getCurrentUserId();
+        if (lastSyncTime != null) {
+            query= String.format(
+                    "SELECT * FROM " + TASKS_TABLE_NAME +
+                            " WHERE " + LAST_UPDATE_TIME_COLUMN + " > \"%s\" AND " +
+                            AUTHOR_ID_COLUMN + " = %d;",
+                    lastSyncTime,
+                    id
+            );
+        } else {
+             query = String.format(
+                    "SELECT * FROM " + TASKS_TABLE_NAME +
+                            " WHERE " + AUTHOR_ID_COLUMN + " = %d;",
+                     id
+             );
+        }
 
         SQLiteDatabase db = dbManager.getReadableDatabase();
         Cursor cursor = db.rawQuery(query, null);
@@ -262,7 +268,7 @@ public class TasksDbService {
                         DEADLINE_COLUMN + "," +
                         NOTIFICATION_TIME_COLUMN + "," +
                         LAST_UPDATE_TIME_COLUMN + ")" +
-                        " VALUES( %d, %d, %d, %d, \"%s\", \"%s\", \"%s\", \"%s\", \"%s\"), ",
+                        " VALUES( %d, %d, %d, %d, \"%s\", \"%s\", \"%s\", \"%s\", \"%s\"); ",
                 task.getGlobalId(),
                 task.getAuthorId(),
                 task.getChangedBy(),
@@ -291,7 +297,7 @@ public class TasksDbService {
                         DEADLINE_COLUMN  + " =\"%s\", " +
                         NOTIFICATION_TIME_COLUMN + " =\"%s\", " +
                         LAST_UPDATE_TIME_COLUMN + " = \"%s\" " +
-                        " WHERE " + LOCAL_ID_COLUMN + " = %d:",
+                        " WHERE " + LOCAL_ID_COLUMN + " = %d;",
                     task.getGlobalId(),
                     task.getAuthorId(),
                     task.getChangedBy(),

@@ -50,9 +50,9 @@ public class UserDbService {
         );
         Log.d("db", query);
 
-        db.execSQL("INSERT INTO " + CURRENT_USER_TABLE_NAME +
-                "("+ CURRENT_USER_KEY_COLUMN+","  +CURRENT_USER_ID_COLUMN + " ) " +
-                "VALUES(" + CURRENT_USER_KEY +", -1);");
+        //db.execSQL("INSERT INTO " + CURRENT_USER_TABLE_NAME +
+        //        "("+ CURRENT_USER_KEY_COLUMN+","  +CURRENT_USER_ID_COLUMN + " ) " +
+        //        "VALUES(" + CURRENT_USER_KEY +", -1);");
     }
 
     public static void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -78,9 +78,11 @@ public class UserDbService {
     public void setCurrentUser(UserModel user){
         SQLiteDatabase db = dbManager.getWritableDatabase();
 
-        db.execSQL(String.format("UPDATE " + CURRENT_USER_TABLE_NAME +
-                " SET " +  CURRENT_USER_ID_COLUMN + " = %d " +
-                "WHERE " + CURRENT_USER_KEY_COLUMN + "=0;", user.getId()));
+        db.execSQL(String.format("REPLACE INTO " + CURRENT_USER_TABLE_NAME + "(" +
+                CURRENT_USER_KEY_COLUMN + "," +
+                CURRENT_USER_ID_COLUMN + ")" +
+                " VALUES ( " + CURRENT_USER_KEY +", %d )",
+                user.getId()));
         addUser(user);
     }
 
@@ -104,5 +106,11 @@ public class UserDbService {
                 null
                 );
         return (new UserModel.Builder()).buildOneInstance(cursor);
+    }
+
+    public void removeLastUser() {
+        SQLiteDatabase db = dbManager.getWritableDatabase();
+        db.execSQL("DELETE FROM " + CURRENT_USER_TABLE_NAME);
+
     }
 }

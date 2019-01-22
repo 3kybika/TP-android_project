@@ -135,4 +135,10 @@ public class CookieService implements CookieJar {
 
         return (count > 0);
     }
+
+    public void removeCookies() {
+        String deleteQuery ="DELETE FROM Cookies;";
+        SQLiteDatabase database = dbManager.getWritableDatabase();
+        database.execSQL(deleteQuery);
+    }
 }

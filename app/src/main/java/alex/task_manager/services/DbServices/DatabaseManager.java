@@ -40,6 +40,7 @@ public class DatabaseManager {
         TasksDbService.createDatabase(db);
         UserDbService.createDatabase(db);
         NotificationDbService.createTable(db);
+        SyncDbService.createDatabase(db);
     }
 
     private static void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -47,6 +48,7 @@ public class DatabaseManager {
         TasksDbService.upgrade(db, oldVersion, newVersion);
         UserDbService.upgrade(db, oldVersion, newVersion);
         NotificationDbService.upgrade(db, oldVersion, newVersion);
+        SyncDbService.upgrade(db, oldVersion, newVersion);
     }
 
     public SQLiteDatabase getWritableDatabase() {

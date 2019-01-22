@@ -11,17 +11,16 @@ import alex.task_manager.utils.TimestampUtils;
 
 public class SyncDbService {
 
-    public static final String USER_TABLE_NAME = "Users";
-
     Context context;
     DatabaseManager dbManager;
     private static final SyncDbService mInstance = new SyncDbService();
+    private UserDbService userDbService;
 
     public static final String
             //table name
             SYNC_TABLE_NAME = "Last_time_update",
-    //table columns
-    ID_COLUMN = "_id",
+            //table columns
+            ID_COLUMN = "user_id",
             LAST_UPDATE_TIME_COLUMN = "last_update_time";
 
     public static final int  LAST_UPDATE_TIME_ID = 0;
@@ -29,6 +28,7 @@ public class SyncDbService {
     public static SyncDbService getInstance(Context context) {
         mInstance.context = context;
         mInstance.dbManager = DatabaseManager.getInstance(context);
+        mInstance.userDbService = UserDbService.getInstance(context);
         return mInstance;
     }
 
@@ -40,14 +40,6 @@ public class SyncDbService {
                 LAST_UPDATE_TIME_COLUMN + " TIMESTAMP NOT NULL" +
                 ")"
         );
-        db.execSQL(String.format(
-                "INSERT INTO " + SYNC_TABLE_NAME + " (" +
-                        ID_COLUMN +  ", " +
-                        LAST_UPDATE_TIME_COLUMN +
-                        ") VALUES(%d, %s);",
-                LAST_UPDATE_TIME_ID,
-                TimestampUtils.getNowString(TimestampUtils.FULL_DATE_FORMAT)
-        ));
     }
 
     public static void upgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -58,20 +50,27 @@ public class SyncDbService {
     }
 
     public void setLastSyncTime(Timestamp time) {
+        int id = userDbService.getCurrentUserId();
         SQLiteDatabase database = dbManager.getWritableDatabase();
-        database.execSQL(String.format("UPDATE " + SYNC_TABLE_NAME +
-                        " SET " + LAST_UPDATE_TIME_COLUMN + " = %d " +
-                        " WHERE _id=" + LAST_UPDATE_TIME_ID + ";",
-                TimestampUtils.timestampToString(time,TimestampUtils.FULL_DATE_FORMAT))
-        );
+        database.execSQL(String.format(
+                "REPLACE INTO " + SYNC_TABLE_NAME + "(" +
+                                    ID_COLUMN  + ", " +
+                                    LAST_UPDATE_TIME_COLUMN + ")" +
+                " VALUES ( %d, \"%s\"); ",
+                id,
+                TimestampUtils.timestampToString(time,TimestampUtils.FULL_DATE_FORMAT)
+        ));
     }
 
     public Timestamp getLastSyncTime() {
+        int id = userDbService.getCurrentUserId();
         SQLiteDatabase database = dbManager.getReadableDatabase();
-        Cursor cursor = database.rawQuery("SELECT " + LAST_UPDATE_TIME_COLUMN +
+        Cursor cursor = database.rawQuery(String.format(
+                "SELECT " + LAST_UPDATE_TIME_COLUMN +
                         " FROM " + SYNC_TABLE_NAME +
-                        " WHERE " + LAST_UPDATE_TIME_ID + " = " + LAST_UPDATE_TIME_ID + ";",
-                null);
+                        " WHERE " + ID_COLUMN + " = %d;",
+                id),
+        null);
 
         return (new Mappers.TimestampMapper()).buildOneInstance(cursor);
     }

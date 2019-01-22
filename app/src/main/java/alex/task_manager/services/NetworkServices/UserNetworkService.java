@@ -34,8 +34,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class UserNetworkService {
 
     //private static final String BASE_URL = "http://95.142.47.111:8081/api/users/";
-//    public static final String BASE_URL = "http://10.0.2.2:8081/api/users/";
-    public static final String BASE_URL = "https://android.4eburek.site/api/users/";
+    public static final String BASE_URL = "http://10.0.2.2:8081/api/users/";
+   // public static final String BASE_URL = "https://android.4eburek.site/api/users/";
     private UsersApi api;
     private static final Gson GSON = new GsonBuilder().create();
 
@@ -93,13 +93,16 @@ public class UserNetworkService {
                 try {
                     final Response<ResponseBody> response = request.execute();
                     try (final ResponseBody responseBody = response.body()) {
+
+                        if (response.code() != HttpURLConnection.HTTP_OK  ) {
+                            invokeErrorCode(handler, response.code(), null);
+                            return;
+                        }
                         if (responseBody == null) {
-                            throw new IOException("Cannot get body");
+                             throw new IOException("Cannot get body");
                         }
                         final String body = responseBody.string();
-                        if (response.code() != HttpURLConnection.HTTP_OK  ) {
-                            invokeErrorCode(handler, response.code(), parseMessage(body));
-                        }
+
                         invokeSuccess(handler, parseUser(body));
                     }
                 } catch (IOException e) {
@@ -178,4 +181,9 @@ public class UserNetworkService {
     public ListenerHandler<OnUserGetListener> getme (final OnUserGetListener listener) {
         return sendRequest( api.getUser(), listener);
     }
+
+    public ListenerHandler<OnUserGetListener> logOut (final OnUserGetListener listener) {
+        return sendRequest( api.logOut(), listener);
+    }
+
 }

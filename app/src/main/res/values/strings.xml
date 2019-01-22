@@ -46,11 +46,15 @@
     <string name="CreatingTaskActivity_btnText__reset"> Reset </string>
     <string name="CreatingTaskActivity__infoMsg__successCreating"> Task created! </string>
     <string name="CreatingTaskActivity__infoMsg__successEditing"> Task saved! </string>
-    CreatingTaskActivity__err__timeWithoutDate
 
     <string name="CreatingTaskActivity__err__nameEmpty">Task name is required</string>
     <string name="CreatingTaskActivity__err__descriptionEmpty">Task description is required</string>
     <string name="CreatingTaskActivity__err__timeWithoutDate"> You set time but date was not specified! </string>
+
+
+    <!-- tasks activity-->
+    <string name="TasksActivity__msg__syncSucsceed"> Synchronized! </string>
+    <string name="TasksActivity__msg__syncError"> Synchronisation failed! Please, check your internet connection! </string>
 
 
     <string name="navigation_drawer_open">Open navigation drawer</string>

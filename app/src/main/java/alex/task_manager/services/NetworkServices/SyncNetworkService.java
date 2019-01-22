@@ -33,7 +33,7 @@ public class SyncNetworkService {
     public static final String BASE_URL = "http://10.0.2.2:8081/api/service/";
     //public static final String BASE_URL = "https://android.4eburek.site/api/users/";
     private SyncApi api;
-    private static final Gson GSON = new GsonBuilder().create();
+    private static final Gson GSON = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
 
     private final Executor executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -52,7 +52,7 @@ public class SyncNetworkService {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(GSON))
                 .client(oktHttpClient.build())
                 .build();
         api = retrofit.create(SyncApi.class);

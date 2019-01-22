@@ -38,26 +38,34 @@ public class SyncService {
         syncNetworkService = SyncNetworkService.getInstance(context);
     }
 
-    SyncNetworkService.OnSyncListener syncListener = new SyncNetworkService.OnSyncListener() {
+    class SyncListener implements SyncNetworkService.OnSyncListener{
+
+        private syncListenerInterface syncListener;
+
+        SyncListener(syncListenerInterface syncListener) {
+            this.syncListener = syncListener;
+        }
+
         @Override
         public void onSuccess(SyncResponse response) {
             tasksDbService.syncTasks(response.getCurrentTasks());
             syncDbService.setLastSyncTime(response.getLastSyncTime());
+            syncListener.onSuccess();
         }
 
         @Override
         public void onError(Exception error) {
-            //ToDo
+            syncListener.onError(error);
         }
 
         @Override
         public void onForbidden(DefaultResponse response) {
-            //ToDo
+            syncListener.onErrorResponse(response);
         }
 
         @Override
         public void onNotFound(DefaultResponse response) {
-            //ToDo
+            syncListener.onErrorResponse(response);
         }
     };
 
@@ -69,17 +77,24 @@ public class SyncService {
         this.online = online;
     }
 
-    public void synchronize() {
+    public void synchronize(syncListenerInterface listener) {
         SyncRequest request = new SyncRequest();
 
         Timestamp lastSyncTime = syncDbService.getLastSyncTime();
-        request.setLastSyncTime(lastSyncTime);
 
+        request.setLastSyncTime(lastSyncTime);
         request.setCurrentTasks(
                 (tasksDbService.getTasksForSync(lastSyncTime))
         );
-
+        SyncListener syncListener = new SyncListener(listener);
         syncNetworkService.sync(request, syncListener);
+    }
 
+    public interface syncListenerInterface {
+        void onSuccess();
+
+        void onError(final Exception error);
+
+        void onErrorResponse(final DefaultResponse response);
     }
 }

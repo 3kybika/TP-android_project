@@ -36,6 +36,15 @@ public class TimestampUtils {
         return dateFormat.format(timestamp.getTime());
     }
 
+    public static String timestampToString(Timestamp timestamp) {
+        if (timestamp == null ){
+            return  null;
+        }
+        @SuppressLint("SimpleDateFormat") final SimpleDateFormat dateFormat = new SimpleDateFormat(FULL_DATE_FORMAT);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return dateFormat.format(timestamp.getTime());
+    }
+
     public static String calendarToString(Calendar calendar, String format) {
         if (calendar == null ){
             return  null;

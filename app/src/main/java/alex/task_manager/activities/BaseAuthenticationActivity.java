@@ -24,6 +24,7 @@ public abstract class BaseAuthenticationActivity extends AppCompatActivity {
         public void onUserSuccess(final UserModel user){
             //we successfully loggined in!
             userDbService.setCurrentUser(user);
+            showSuccessMessage(user);
             changeToMainActivity();
         }
 
@@ -35,15 +36,21 @@ public abstract class BaseAuthenticationActivity extends AppCompatActivity {
                 showMsgAboutOfflineStage(error);
                 changeToMainActivity();
             } else {
+                cookieService.removeCookies();
+                userDbService.removeLastUser();
                 showErrorAboutUnavailable(error);
             }
         }
 
         public void onForbidden(final DefaultResponse response){
+            cookieService.removeCookies();
+            userDbService.removeLastUser();
             showErrorAboutUncorrectValues(response);
         }
 
         public void onNotFound(final DefaultResponse response){
+            cookieService.removeCookies();
+            userDbService.removeLastUser();
             showErrorAboutUncorrectValues(response);
         }
     };
@@ -58,16 +65,22 @@ public abstract class BaseAuthenticationActivity extends AppCompatActivity {
 
         @Override
         public void onUserError(final Exception error) {
+            cookieService.removeCookies();
+            userDbService.removeLastUser();
             showErrorAboutUnavailable(error);
         }
 
         @Override
         public void onForbidden(final DefaultResponse response) {
+            cookieService.removeCookies();
+            userDbService.removeLastUser();
             showErrorAboutUncorrectValues(response);
         }
 
         @Override
         public void onNotFound(final DefaultResponse response) {
+            cookieService.removeCookies();
+            userDbService.removeLastUser();
             showErrorAboutUncorrectValues(response);
         }
 
@@ -88,6 +101,9 @@ public abstract class BaseAuthenticationActivity extends AppCompatActivity {
         UserModel user =  userDbService.getCurrentUser();
         if ( user!= null && user.getId()!= -1 || cookieService.hasCookie(userNetworkService.BASE_URL)) {
             userNetworkService.getme(getMeListener);
+        } else {
+            cookieService.removeCookies();
+            userDbService.removeLastUser();
         }
     }
 
@@ -97,6 +113,7 @@ public abstract class BaseAuthenticationActivity extends AppCompatActivity {
             inputMethodManager.hideSoftInputFromWindow(input.getWindowToken(), 0);
         }
     }
+
 
     protected abstract void changeToMainActivity();
     protected abstract void showErrorAboutUnavailable(Exception exception);

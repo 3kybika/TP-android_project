@@ -47,9 +47,10 @@ public abstract class DbModelBuilder<T> {
         final List<T> resultList = new ArrayList<>();
         if(cursor.moveToFirst()) {
             try {
-                while (cursor.moveToNext()) {
+                do  {
                     resultList.add( mapper(cursor));
                 }
+                while(cursor.moveToNext());
             } finally {
                 cursor.close();
             }

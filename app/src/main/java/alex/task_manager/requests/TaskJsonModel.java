@@ -31,6 +31,7 @@ public class TaskJsonModel {
 
     @SerializedName("deadline")
     private Timestamp deadline;
+
     @SerializedName("notification_time")
     private Timestamp notificationTime;
     @SerializedName("last_change_time")
@@ -118,6 +119,7 @@ public class TaskJsonModel {
 
         this.name = name;
         this.about = about;
+
 
         this.deadline = deadline;
         this.notificationTime = notificationTime;
