@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Task Manager</string>
 
     <!-- Login Activity -->
     <string name="LoginActivity__title__login">Login</string>
