@@ -9,7 +9,6 @@ import android.util.Log;
 import java.sql.Timestamp;
 import java.util.List;
 
-import alex.task_manager.models.DbModelBuilder;
 import alex.task_manager.models.TaskForm;
 import alex.task_manager.models.TaskModel;
 import alex.task_manager.requests.TaskJsonModel;
@@ -44,7 +43,7 @@ public class TasksDbService {
         return mInstance;
     }
 
-    public static void  createDatabase(SQLiteDatabase db) {
+    public static void createDatabase(SQLiteDatabase db) {
         Log.d("Tasks Service", "onCreate database");
         // создаем таблицу с полями
         db.execSQL("CREATE TABLE "+ TASKS_TABLE_NAME +" (" +
@@ -97,13 +96,7 @@ public class TasksDbService {
             taskId = database.insert(TASKS_TABLE_NAME, null, cv);
         }
 
-        try (SQLiteDatabase database = dbManager.getReadableDatabase()) {
-            try (Cursor cursorTask = getTaskModelCursorById((int)taskId)) {
-                cursorTask.moveToFirst();
-                TaskModel model = new TaskModel.Builder().buildCurrentInstance(cursorTask);
-                NotificationDbService.getInstance(context).updateTaskNotification(model);
-            }
-        }
+        NotificationOrganizer.getInstance(context).updateTaskNotification(getTaskModelById(taskId));
     }
 
     public void createTask(TaskModel task) {
@@ -122,12 +115,8 @@ public class TasksDbService {
         Log.d("TaskDbManager", String.format("Created task with id %d",rowID));
         database.close();
 
-        database = dbManager.getReadableDatabase();
-
-        NotificationDbService.getInstance(context).updateTaskNotification(task);
+        NotificationOrganizer.getInstance(context).updateTaskNotification(task);
     }
-
-
 
     public Cursor getTaskModelCursorByPerformerId(int performerId) {
 
@@ -165,6 +154,8 @@ public class TasksDbService {
         );
         SQLiteDatabase database = dbManager.getWritableDatabase();
         database.execSQL(updateQuery);
+
+        NotificationOrganizer.getInstance(context).updateTaskNotification(getTaskModelById(id));
     }
 
     public void setDeleted(int id) {
@@ -177,6 +168,8 @@ public class TasksDbService {
         );
         SQLiteDatabase database = dbManager.getWritableDatabase();
         database.execSQL(updateQuery);
+
+        NotificationOrganizer.getInstance(context).updateTaskNotification(getTaskModelById(id));
     }
 
     public void updateTask(int id, TaskModel task) {
@@ -219,17 +212,8 @@ public class TasksDbService {
                 TimestampUtils.getNowString(TimestampUtils.FULL_DATE_FORMAT),
                 id
         ));
-    }
 
-    public void removeTask(int id) {
-        SQLiteDatabase db = dbManager.getWritableDatabase();
-
-        db.execSQL(String.format(
-                "DELETE *" +
-                " FROM " + TASKS_TABLE_NAME +
-                " WHERE " + LOCAL_ID_COLUMN + " =%d",
-                id
-        ));
+        NotificationOrganizer.getInstance(context).updateTaskNotification(getTaskModelById(id));
     }
 
     public List<TaskJsonModel> getTasksForSync(Timestamp lastSyncTime) {
@@ -305,7 +289,10 @@ public class TasksDbService {
                 );
 
         SQLiteDatabase db = dbManager.getWritableDatabase();
+
         db.execSQL(query);
+
+        NotificationOrganizer.getInstance(context).updateTaskNotification(getTaskModelById(task.getLocalId()));
     }
 
     public void syncTasks (List<TaskJsonModel> updatedTasks) {
@@ -318,4 +305,13 @@ public class TasksDbService {
         }
     }
 
+    public TaskModel getTaskModelById(long id) {
+        try (Cursor cursorTask = getTaskModelCursorById((int)id)) {
+            cursorTask.moveToFirst();
+            return new TaskModel.Builder().buildCurrentInstance(cursorTask);
+        } catch (Throwable t) {
+            Log.e("TasksDbService", t.toString());
+            return null;
+        }
+    }
 }
