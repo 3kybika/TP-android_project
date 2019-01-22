@@ -17,7 +17,7 @@
 
     <!-- Sign up Activity -->
     <string name="SignUpActivity__title__signup">Регистрация</string>
-    <string name="SignUpActivity__hint__email">Электронная почт</string>
+    <string name="SignUpActivity__hint__email">Электронная почта</string>
     <string name="SignUpActivity__hint__password">Пароль</string>
     <string name="SignUpActivity__hint__login">Логин</string>
     <string name="SignUpActivity__text__haveAccount">Уже есть аккаунт? Войти </string>
@@ -33,12 +33,26 @@
 
 
     <!-- create task activity-->
-    <string name="CreatingTaskActivity__hint__title"> Task name </string>
-    <string name="CreatingTaskActivity__hint_descripion"> Task description </string>
-    <string name="CreatingTaskActivity__btnText_create"> Create task </string>
+    <string name="CreatingTaskActivity__hint__title"> Заголовок </string>
+    <string name="CreatingTaskActivity__hint__descripion"> Описание </string>
+    <string name="CreatingTaskActivity__btnText__create"> Сохранить </string>
+    <string name="CreatingTaskActivity__hint__date"> Дата дедлайна </string>
+    <string name="CreatingTaskActivity_btnText__today"> Сегодня </string>
+    <string name="CreatingTaskActivity_btnText__tomorrow"> Завтра </string>
+    <string name="CreatingTaskActivity_btnText__nextWeek"> Следующая неделя </string>
+    <string name="CreatingTaskActivity_btnText__select"> Выбрать </string>
+    <string name="CreatingTaskActivity__hint__alarm"> Напомнить </string>
+    <string name="CreatingTaskActivity_btnText__reset"> Сброс </string>
+    <string name="CreatingTaskActivity__infoMsg__successCreating"> Задача создана! </string>
+    <string name="CreatingTaskActivity__infoMsg__successEditing"> Задача сохранена! </string>
 
-    <string name="CreatingTaskActivity__err__nameEmpty">Task name is required</string>
-    <string name="CreatingTaskActivity__err__descriptionEmpty">Task description is required</string>
+    <string name="CreatingTaskActivity__err__nameEmpty">Требуется заголовок задачи</string>
+    <string name="CreatingTaskActivity__err__timeWithoutDate"> Требуется задать дату, если задано время! </string>
+
+
+    <!-- tasks activity-->
+    <string name="TasksActivity__msg__syncSucsceed"> Синхронизировано! </string>
+    <string name="TasksActivity__msg__syncError"> Синхронизация не удалась! Проверьте интернет соединение! </string>
 
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
